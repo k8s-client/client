@@ -1,0 +1,70 @@
+{
+  "name": "crs/k8s",
+  "description": "A Kubernetes client for PHP.",
+  "minimum-stability": "stable",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Chad Sikorra",
+      "email": "Chad.Sikorra@gmail.com"
+    }
+  ],
+  "keywords": [
+    "k8s",
+    "kubernetes"
+  ],
+  "repositories": [
+    { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-api-generator.git" },
+    { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-ws-ratchet.git" }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "ext-json": "*",
+    "doctrine/collections": "^1.5",
+    "klkvsk/json-decode-stream": "^1.0",
+    "php-http/discovery": "^1.0",
+    "psr/http-client": "^1.0",
+    "psr/http-factory": "^1.0",
+    "psr/http-message": "^1.0",
+    "psr/simple-cache": "^1.0"
+  },
+  "require-dev": {
+    "crs/k8s-api-generator": "dev-master",
+    "crs/k8s-ws-ratchet": "dev-master",
+    "friendsofphp/php-cs-fixer": "^2.0",
+    "mockery/mockery": "~1.3.0",
+    "nyholm/psr7": "^1.0",
+    "php-http/httplug": "^2.0",
+    "phpstan/phpstan": "^0.12",
+    "phpunit/phpunit": "^8.5",
+    "symfony/http-client": "^5.1"
+  },
+  "suggest": {
+    "crs/k8s-ws-ratchet": "Ratchet based websocket adapter for websocket based API requests.",
+    "symfony/cache": "For a PSR-16 implementation to cache Kubernetes model metadata information.",
+    "nyholm/psr7": "For PSR-7 HTTP request / responses and PSR-17 HTTP factory implementations.",
+    "symfony/http-client": "For a PSR-18 HTTP Client implementation."
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Crs\\K8s\\": "src/Crs/K8s"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "unit\\Crs\\K8s\\": "tests/unit/Crs/K8s"
+    }
+  },
+  "scripts": {
+    "cs-fix": [
+      "@putenv PHP_CS_FIXER_IGNORE_ENV=1",
+      "php-cs-fixer fix src/ --rules=@PSR2"
+    ],
+    "analyse": [
+      "phpstan analyse"
+    ]
+  }
+}
