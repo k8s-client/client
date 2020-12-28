@@ -13,12 +13,18 @@ declare(strict_types=1);
 
 namespace K8s\Client\Metadata;
 
+use K8s\Client\Exception\RuntimeException;
 use K8s\Core\Annotation\Kind;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Psr\SimpleCache\CacheInterface;
 
 class MetadataCache
 {
+    private const MODEL_PATHS = [
+        __DIR__ . '/../../../../../api/src/K8s/Api/Model',
+        __DIR__ . '/../../../../vendor/k8s/api/src/K8s/Api/Model',
+    ];
+
     /**
      * @var array<class-string, ModelMetadata>
      */
@@ -106,8 +112,21 @@ class MetadataCache
 
     private function populateKindMap(): void
     {
+        $path = null;
+
+        foreach (self::MODEL_PATHS as $modelPath) {
+            if (file_exists($modelPath)) {
+                $path = $modelPath;
+                break;
+            }
+        }
+
+        if ($path === null) {
+            throw new RuntimeException('Unable to locate the path to the Kubernetes API model classes.');
+        }
+
         $directory = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator(__DIR__ . '/../../../../vendor/k8s/api/src/Model')
+            new \RecursiveDirectoryIterator($path)
         );
 
         $reader = new AnnotationReader();
