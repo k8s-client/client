@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace K8s\Client\Serialization;
 
+use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use K8s\Core\Collection;
 use K8s\Client\Metadata\MetadataCache;
-use K8s\Client\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use ReflectionClass;
 use ReflectionObject;
 

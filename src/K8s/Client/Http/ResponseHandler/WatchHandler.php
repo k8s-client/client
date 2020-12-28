@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace K8s\Client\Http\ResponseHandler;
 
+use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Http\HttpClient;
-use K8s\Client\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use JsonDecodeStream\Parser;
 use Psr\Http\Message\ResponseInterface;
 

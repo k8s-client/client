@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace K8s\Client\Kind;
 
-use K8s\Client\Service\Core\v1\PodService;
+use K8s\Api\Service\Core\v1\PodService;
 use DateTimeInterface;
 
 class PodLogService

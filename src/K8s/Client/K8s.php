@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace K8s\Client;
 
+use K8s\Api\Service\ServiceFactory;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
-use K8s\Client\Service\ServiceFactory;
 
 class K8s
 {

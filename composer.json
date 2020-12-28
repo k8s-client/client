@@ -16,11 +16,13 @@
   "repositories": [
     { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-api-generator.git" },
     { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-ws-ratchet.git" },
-    { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-core.git" }
+    { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-core.git" },
+    { "type": "vcs", "url": "https://github.com/ChadSikorra/k8s-api.git" }
   ],
   "require": {
     "php": ">=7.2",
     "ext-json": "*",
+    "k8s/api": "*",
     "k8s/core": "^1.0",
     "klkvsk/json-decode-stream": "^1.0",
     "php-http/discovery": "^1.0",
