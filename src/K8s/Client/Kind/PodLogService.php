@@ -58,7 +58,7 @@ class PodLogService
     /**
      * If true, add an RFC3339 or RFC3339Nano timestamp at the beginning of every line of log output. Defaults to false.
      */
-    public function withTimestamps(bool $withTimestamps): self
+    public function withTimestamps(bool $withTimestamps = true): self
     {
         $this->options['timestamps'] = $withTimestamps;
 
@@ -79,7 +79,7 @@ class PodLogService
     /**
      * Return previous terminated container logs. Defaults to false.
      */
-    public function showPrevious(bool $showPrevious): self
+    public function showPrevious(bool $showPrevious = true): self
     {
         $this->options['previous'] = $showPrevious;
 
