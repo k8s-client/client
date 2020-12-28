@@ -58,6 +58,9 @@ class ModelPropertyMetadata
         return $this->attribute->type === 'model';
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getModelFqcn(): ?string
     {
         return $this->attribute->model;

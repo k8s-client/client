@@ -21,6 +21,7 @@ class ModelNormalizer
 {
     /**
      * @param object $model
+     * @param class-string $modelFqcn
      */
     public function normalize($model, string $modelFqcn, MetadataCache $cache): array
     {

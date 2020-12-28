@@ -56,11 +56,12 @@ class Serializer
             );
         }
 
-        return json_encode($data);
+        return (string)json_encode($data);
     }
 
     /**
      * @param string|array $data
+     * @param class-string $model
      */
     public function deserialize($data, string $model): object
     {

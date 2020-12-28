@@ -32,6 +32,9 @@ class MetadataParser
         $this->annotationReader = $annotationReader ?? new AnnotationReader();
     }
 
+    /**
+     * @param class-string $modelFqcn
+     */
     public function parse(string $modelFqcn): ModelMetadata
     {
         $kind = null;

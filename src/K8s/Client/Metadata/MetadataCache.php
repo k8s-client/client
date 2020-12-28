@@ -20,12 +20,12 @@ use Psr\SimpleCache\CacheInterface;
 class MetadataCache
 {
     /**
-     * @var ModelMetadata[]
+     * @var array<class-string, ModelMetadata>
      */
     private $modelMetadata = [];
 
     /**
-     * @var array<string, string[]>
+     * @var array<string, class-string[]>
      */
     private $kindMap = [];
 
@@ -47,6 +47,9 @@ class MetadataCache
         $this->cache = $cache;
     }
 
+    /**
+     * @param class-string $modelFqcn
+     */
     public function get(string $modelFqcn): ModelMetadata
     {
         $metadata = null;
@@ -59,6 +62,9 @@ class MetadataCache
         return $metadata;
     }
 
+    /**
+     * @return class-string|null
+     */
     public function getModelFqcnFromKind(string $apiVersion, string $kind): ?string
     {
         if (empty($this->kindMap)) {
@@ -68,6 +74,9 @@ class MetadataCache
         return $this->kindMap[$apiVersion][$kind] ?? null;
     }
 
+    /**
+     * @param class-string $modelFqcn
+     */
     private function getOrCacheMetadata(string $modelFqcn): ModelMetadata
     {
         $metadata = $this->cache->get($modelFqcn);
@@ -82,6 +91,9 @@ class MetadataCache
         return $metadata;
     }
 
+    /**
+     * @param class-string $modelFqcn
+     */
     private function getMetadataWithoutCache(string $modelFqcn): ModelMetadata
     {
         if (isset($this->modelMetadata[$modelFqcn])) {
@@ -111,6 +123,7 @@ class MetadataCache
             if (!isset($matches[1])) {
                 continue;
             }
+            /** @var class-string $fqcn */
             $fqcn = 'K8s\\Api' . str_replace(DIRECTORY_SEPARATOR, '\\', $matches[1]);
 
             $class = new \ReflectionClass($fqcn);

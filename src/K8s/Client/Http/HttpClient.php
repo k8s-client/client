@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace K8s\Client\Http;
 
+use K8s\Client\Exception\InvalidArgumentException;
 use K8s\Core\Exception\HttpException;
 use K8s\Client\Serialization\Serializer;
 use Psr\Http\Client\ClientExceptionInterface;
@@ -55,17 +56,25 @@ class HttpClient
     }
 
     /**
-     * @param array|object $options
+     * @param array $options
      * @return mixed
      * @throws HttpException
+     * @throws InvalidArgumentException
      */
-    public function send(string $uri, string $action, $options)
+    public function send(string $uri, string $action, array $options)
     {
         $model = $options['model'] ?? null;
         $body = $options['body'] ?? null;
 
         if ($body) {
             $body = $this->serializer->serialize($body);
+        }
+
+        if (!(is_string($body) || is_null($body))) {
+            throw new InvalidArgumentException(sprintf(
+                'The body sent to the API must be a string or null, got: %s',
+                gettype($body)
+            ));
         }
 
         try {

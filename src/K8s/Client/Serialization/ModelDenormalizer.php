@@ -21,6 +21,9 @@ use ReflectionObject;
 
 class ModelDenormalizer
 {
+    /**
+     * @param class-string $modelFqcn
+     */
     public function denormalize(array $data, string $modelFqcn, MetadataCache $cache): object
     {
         $metadata = $cache->get($modelFqcn);

@@ -136,7 +136,7 @@ class K8s
      * Watch a Kubernetes resource of a specific Kind with a callable in a namespace.
      *
      * @param callable $handler The callable to invoke for each watched resource.
-     * @param string $kindFqcn The fully-qualified class name of the resource to list.
+     * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      */
