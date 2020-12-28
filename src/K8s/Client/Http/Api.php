@@ -48,7 +48,7 @@ class Api implements ApiInterface
      */
     public function executeHttp(string $uri, string $action, array $options)
     {
-        return $this->executeHttp($uri, $action, $options);
+        return $this->httpClient->send($uri, $action, $options);
     }
 
     /**
