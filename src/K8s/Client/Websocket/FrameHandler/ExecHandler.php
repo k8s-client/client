@@ -57,7 +57,7 @@ class ExecHandler implements FrameHandlerInterface
         if ($channelNum === null) {
             throw new WebsocketException('Unable to determine the protocol channel from the data.');
         }
-        $channel = self::CHANNELS[(int)$channelNum] ?? null;
+        $channel = self::CHANNELS[ord($channelNum)] ?? null;
         if ($channel === null) {
             throw new WebsocketException(sprintf(
                 'The channel number %s is not recognized.',
