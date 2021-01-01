@@ -244,7 +244,9 @@ class KindManager
         if ($operation->isBodyRequired()) {
             $options['body'] = $object;
         }
-        if ($operation->getResponseFqcn()) {
+        if ($operation->isResponseSelf()) {
+            $options['model'] = $metadata->getModelFqcn();
+        } elseif ($operation->getResponseFqcn()) {
             $options['model'] = $operation->getResponseFqcn();
         }
         $query = $options['query'] ?? [];

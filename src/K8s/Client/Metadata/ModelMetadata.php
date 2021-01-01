@@ -69,6 +69,19 @@ class ModelMetadata
         return $this->properties;
     }
 
+    /**
+     * @return OperationMetadata[]
+     */
+    public function getOperations(): array
+    {
+        return $this->operations;
+    }
+
+    public function getKind(): ?KindMetadata
+    {
+        return $this->kind;
+    }
+
     public function getOperationByType(string $type): OperationMetadata
     {
         foreach ($this->operations as $operation) {

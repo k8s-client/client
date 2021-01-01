@@ -48,8 +48,17 @@ class OperationMetadata
         return !empty($this->operation->body);
     }
 
+    public function isResponseSelf(): bool
+    {
+        return $this->operation->response === 'static::class';
+    }
+
     public function getResponseFqcn(): ?string
     {
+        if ($this->isResponseSelf()) {
+            return null;
+        }
+
         return $this->operation->response;
     }
 

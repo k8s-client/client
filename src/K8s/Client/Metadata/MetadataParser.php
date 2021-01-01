@@ -37,11 +37,45 @@ class MetadataParser
      */
     public function parse(string $modelFqcn): ModelMetadata
     {
+        $modelClass = new ReflectionClass($modelFqcn);
+        $metadata = $this->parseModelMetadata($modelClass);
+
+        /** @var ModelMetadata[] $parents */
+        $parents = [];
+        while (($modelClass = $modelClass->getParentClass()) !== false) {
+            $parents[] = $this->parseModelMetadata($modelClass);
+        }
+
+        if (empty($parents)) {
+            return $metadata;
+        }
+
+        $kind = $metadata->getKind();
+        $operations = $metadata->getOperations();
+        $properties = $metadata->getProperties();
+
+        foreach ($parents as $parent) {
+            $operations = array_merge($operations, $parent->getOperations());
+            $properties = array_merge($properties, $metadata->getProperties());
+            if (!$kind && $parent->getKind()) {
+                $kind = $parent->getKind();
+            }
+        }
+
+        return new ModelMetadata(
+            $modelFqcn,
+            $properties,
+            $operations,
+            $kind
+        );
+    }
+
+    private function parseModelMetadata(ReflectionClass $modelClass): ModelMetadata
+    {
         $kind = null;
         $operations = [];
         $properties = [];
 
-        $modelClass = new ReflectionClass($modelFqcn);
         $classAnnotations = $this->annotationReader->getClassAnnotations($modelClass);
 
         foreach ($classAnnotations as $classAnnotation) {
@@ -61,7 +95,7 @@ class MetadataParser
         }
 
         return new ModelMetadata(
-            $modelFqcn,
+            $modelClass->getName(),
             $properties,
             $operations,
             $kind
