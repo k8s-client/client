@@ -1,6 +1,8 @@
 # k8s-client
 
-k8s-client is a Kubernetes API client for PHP.
+k8s-client is a Kubernetes API client for PHP. The Kubernetes resource models and services used by this library are auto-generated
+from the OpenAPI spec of the Kubernetes API. This library provides an easy way of using those models / services from different
+API versions.
 
 ## Installation
 
@@ -10,6 +12,19 @@ Install using composer:
 
 This library requires a [PSR-18 compatible HTTP Client](https://packagist.org/providers/psr/http-client-implementation), such as Guzzle or Symfony's HttpClient.
 It can also be given a [PSR-16 compatible Simple Cache implementation](https://packagist.org/providers/psr/simple-cache-implementation) to help speed up the library.
+
+## Using a Specific Kubernetes API version
+
+Each Kubernetes version may have different resources and operations. If you require a specific version, then you can
+require the version of the `k8s/api` library that you need to use. That library contains all the API specific versions
+and models that are consumed by this library.
+
+For instance, to use API version 1.18:
+
+`composer require k8s/api:"~1.18.0"`
+
+**Note**: The version of `k8s/api` does not exactly reflect the version of the Kubernetes API. The patch version of 
+Kubernetes may not be the same as the `k8s/api` patch version.
 
 ## Installing a Websocket Adapter
 
