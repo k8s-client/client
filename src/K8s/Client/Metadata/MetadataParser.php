@@ -49,24 +49,12 @@ class MetadataParser
         if (empty($parents)) {
             return $metadata;
         }
+        $parents = array_reverse($parents);
+        $parents[] = $metadata;
 
-        $kind = $metadata->getKind();
-        $operations = $metadata->getOperations();
-        $properties = $metadata->getProperties();
-
-        foreach ($parents as $parent) {
-            $operations = array_merge($operations, $parent->getOperations());
-            $properties = array_merge($properties, $metadata->getProperties());
-            if (!$kind && $parent->getKind()) {
-                $kind = $parent->getKind();
-            }
-        }
-
-        return new ModelMetadata(
-            $modelFqcn,
-            $properties,
-            $operations,
-            $kind
+        return $this->parseParentMetadata(
+            $parents,
+            $modelFqcn
         );
     }
 
@@ -117,5 +105,35 @@ class MetadataParser
         }
 
         return $modelPropertyMetadata;
+    }
+
+    /**
+     * @param ModelMetadata[] $parents
+     * @param class-string $modelFqcn
+     */
+    private function parseParentMetadata(array $parents, string $modelFqcn): ModelMetadata
+    {
+        $kind = null;
+        $operations = [];
+        $properties = [];
+
+        foreach ($parents as $parent) {
+            foreach ($parent->getOperations() as $operation) {
+                $operations[$operation->getType()] = $operation;
+            }
+            foreach ($parent->getProperties() as $property) {
+                $properties[$property->getName()] = $property;
+            }
+            if ($parent->getKind()) {
+                $kind = $parent->getKind();
+            }
+        }
+
+        return new ModelMetadata(
+            $modelFqcn,
+            array_values($properties),
+            array_values($operations),
+            $kind
+        );
     }
 }
