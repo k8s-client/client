@@ -22,6 +22,7 @@
   "require": {
     "php": ">=7.2",
     "ext-json": "*",
+    "doctrine/annotations": "^1.0",
     "k8s/api": "*",
     "k8s/core": "^1.0",
     "klkvsk/json-decode-stream": "^1.0",
