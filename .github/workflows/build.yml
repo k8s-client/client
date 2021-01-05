@@ -39,7 +39,7 @@ jobs:
       matrix:
         operating-system: [ubuntu-latest, windows-latest]
         php-versions: ['7.2', '7.3', '7.4', '8.0']
-    name: Unit Tests for PHP ${{ matrix.php-versions }} on ${{ matrix.operating-systems }}
+    name: Unit Tests for PHP ${{ matrix.php-versions }} on ${{ matrix.operating-system }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
