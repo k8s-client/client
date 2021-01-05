@@ -12,6 +12,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '7.4'
+          tools: composer:v2
           extension: openssl,mbstring
           coverage: pcov
 
@@ -48,7 +49,8 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-versions }}
-          extension-csv: openssl,mbstring
+          tools: composer:v2
+          extension: openssl,mbstring
           coverage: pcov
 
       - name: Get Composer Cache Directory
