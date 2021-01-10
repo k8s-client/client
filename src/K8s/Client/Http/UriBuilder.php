@@ -31,7 +31,7 @@ class UriBuilder
     /**
      * @param array|object $query
      */
-    public function buildUri(string $uri, array $parameters, $query, ?string $namespace): string
+    public function buildUri(string $uri, array $parameters = [], $query = [], ?string $namespace = null): string
     {
         $namespace = $namespace ?? $this->options->getNamespace();
         $parameters['{namespace}'] = $namespace;
@@ -52,9 +52,41 @@ class UriBuilder
 
         $uri = $this->options->getEndpoint() . $uri;
         if (!empty($query)) {
-            $uri .= '?' . http_build_query($query);
+            $uri .= $this->buildQueryString($query);
         }
 
         return $uri;
+    }
+
+    private function buildQueryString(array $query): string
+    {
+        $arrayParams = [];
+        foreach ($query as $item => $value) {
+            if (is_array($value)) {
+                $arrayParams[$item] = $value;
+            }
+        }
+
+        $additional = [];
+        if (!empty($arrayParams)) {
+            foreach ($arrayParams as $key => $values) {
+                unset($query[$key]);
+                foreach ($values as $value) {
+                    $additional[] = urlencode($key) . '[]=' . urlencode($value);
+                }
+            }
+        }
+
+        $additional = implode('&', $additional);
+        if (!empty($additional)) {
+            $additional = empty($query) ? '?' . $additional : '&' . $additional;
+        }
+
+        $query = empty($query) ? $additional : http_build_query($query) . $additional;
+        if (!empty($query) && $query[0] !== '?') {
+            $query = '?' . $query;
+        }
+
+        return $query;
     }
 }
