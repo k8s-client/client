@@ -95,7 +95,10 @@ class HttpClient
             }
 
             throw new HttpException(
-                'There was no supported handler found for the API response.',
+                sprintf(
+                    'There was no supported handler found for the API response to path: %s',
+                    $uri
+                ),
                 $response->getStatusCode()
             );
         } catch (ClientExceptionInterface $exception) {
