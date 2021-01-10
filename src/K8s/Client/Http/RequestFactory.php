@@ -71,7 +71,7 @@ class RequestFactory
 
         if ($httpMethod === null) {
             throw new HttpException(sprintf(
-                'The action %s has no recognized HTTP method.',
+                'The action "%s" has no recognized HTTP method.',
                 $action
             ));
         }
@@ -96,10 +96,18 @@ class RequestFactory
             );
         }
 
-        if ($this->options->getToken()) {
+        if ($this->options->getAuthType() === Options::AUTH_TYPE_TOKEN && $this->options->getToken()) {
             $request = $request->withHeader(
                 'Authorization',
                 sprintf('Bearer %s', $this->options->getToken())
+            );
+        } elseif ($this->options->getAuthType() === Options::AUTH_TYPE_BASIC) {
+            $request = $request->withHeader(
+                'Authorization',
+                sprintf(
+                    'Basic %s',
+                    base64_encode("{$this->options->getUsername()}:{$this->options->getPassword()}")
+                )
             );
         }
 
