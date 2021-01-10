@@ -14,13 +14,13 @@ declare(strict_types=1);
 namespace unit\K8s\Http\ResponseHandler;
 
 use K8s\Client\Exception\RuntimeException;
-use K8s\Client\Http\ResponseHandler\WatchHandler;
+use K8s\Client\Http\ResponseHandler\FollowHandler;
 use K8s\Client\Serialization\Serializer;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use unit\K8s\Client\TestCase;
 
-class WatchHandlerTest extends TestCase
+class FollowHandlerTest extends TestCase
 {
     /**
      * @var Serializer|\Mockery\LegacyMockInterface|\Mockery\MockInterface
@@ -28,7 +28,7 @@ class WatchHandlerTest extends TestCase
     private $serializer;
 
     /**
-     * @var WatchHandler
+     * @var FollowHandler
      */
     private $subject;
 
@@ -36,10 +36,42 @@ class WatchHandlerTest extends TestCase
     {
         parent::setUp();
         $this->serializer = \Mockery::spy(Serializer::class);
-        $this->subject = new WatchHandler($this->serializer);
+        $this->subject = new FollowHandler($this->serializer);
     }
 
-    public function testItSupportsWatchTypeApiResponses(): void
+    public function testItSupportsFollowTypeApiResponses(): void
+    {
+        $response = \Mockery::spy(ResponseInterface::class);
+        $response->expects('getHeader')
+            ->with('content-type')
+            ->andReturn(['text/plain']);
+        $response->shouldReceive('getStatusCode')
+            ->andReturn(200);
+
+        $result = $this->subject->supports(
+            $response,
+            ['query' => ['follow' => true], 'handler' => function(){}]
+        );
+        $this->assertTrue($result);
+    }
+
+    public function testItDoesNotSupportQueriesWithoutFollow(): void
+    {
+        $response = \Mockery::spy(ResponseInterface::class);
+        $response->expects('getHeader')
+            ->with('content-type')
+            ->andReturn(['text/plain']);
+        $response->shouldReceive('getStatusCode')
+            ->andReturn(200);
+
+        $result = $this->subject->supports(
+            $response,
+            ['query' => ['follow' => false], 'handler' => function(){}]
+        );
+        $this->assertFalse($result);
+    }
+
+    public function testItOnlySupportsPlainText(): void
     {
         $response = \Mockery::spy(ResponseInterface::class);
         $response->expects('getHeader')
@@ -50,20 +82,7 @@ class WatchHandlerTest extends TestCase
 
         $result = $this->subject->supports(
             $response,
-            ['query' => ['watch' => true], 'handler' => function(){}]
-        );
-        $this->assertTrue($result);
-    }
-
-    public function testItDoesNotSupportQueriesWithoutWatch(): void
-    {
-        $response = \Mockery::spy(ResponseInterface::class);
-        $response->shouldReceive('getStatusCode')
-            ->andReturn(200);
-
-        $result = $this->subject->supports(
-            $response,
-            ['query' => ['watch' => false], 'handler' => function(){}]
+            ['query' => ['follow' => true], 'handler' => function(){}]
         );
         $this->assertFalse($result);
     }
@@ -82,7 +101,7 @@ class WatchHandlerTest extends TestCase
         );
     }
 
-    public function testItHandlesWatchingTheResponse(): void
+    public function testItHandlesFollowingTheResponse(): void
     {
         $stream = \Mockery::mock(StreamInterface::class);
         $response = \Mockery::spy(ResponseInterface::class);
@@ -90,29 +109,23 @@ class WatchHandlerTest extends TestCase
             ->andReturn($stream);
 
         $stream->shouldReceive('read')
-            ->andReturn('{"foo":"bar"}');
+            ->andReturn('log 1', 'log 2');
         $stream->shouldReceive('eof')
             ->andReturn(false, true);
-        $stream->shouldReceive('rewind')
-            ->andReturnNull();
         $stream->shouldReceive('close');
 
         $object = new class { function __invoke(){} };
         $objectMocker = \Mockery::spy($object);
 
-        $watchObj = new \stdClass();
-        $this->serializer->shouldReceive('deserialize')
-            ->with('{"foo":"bar"}')
-            ->andReturn($watchObj);
-
         $objectMocker->shouldReceive('__invoke')
-            ->with($watchObj);
+            ->with('log 1');
+        $objectMocker->shouldReceive('__invoke')
+            ->with('log 2');
 
-        $options = ['query' => ['watch' => true], 'handler' => $objectMocker];
+        $options = ['query' => ['follow' => true], 'handler' => $objectMocker];
         $this->subject->handle($response, $options);
 
         $stream->shouldHaveReceived('read');
-        $this->serializer->shouldHaveReceived('deserialize');
         $objectMocker->shouldHaveReceived('__invoke');
     }
 }
