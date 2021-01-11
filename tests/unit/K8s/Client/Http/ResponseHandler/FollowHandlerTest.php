@@ -58,9 +58,6 @@ class FollowHandlerTest extends TestCase
     public function testItDoesNotSupportQueriesWithoutFollow(): void
     {
         $response = \Mockery::spy(ResponseInterface::class);
-        $response->expects('getHeader')
-            ->with('content-type')
-            ->andReturn(['text/plain']);
         $response->shouldReceive('getStatusCode')
             ->andReturn(200);
 
@@ -94,10 +91,10 @@ class FollowHandlerTest extends TestCase
             ->andReturn(200);
 
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('When using watch in your query you must specify the "handler" callable parameter');
+        $this->expectExceptionMessage('When using follow in your query you must specify the "handler" callable parameter');
         $this->subject->supports(
             $response,
-            ['query' => ['watch' => true]]
+            ['query' => ['follow' => true]]
         );
     }
 
