@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace K8s\Client\Kind;
 
+use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Http\HttpClient;
 use K8s\Client\Http\UriBuilder;
 use K8s\Client\Metadata\MetadataCache;
@@ -86,7 +87,7 @@ class KindManager
             'delete',
             $options,
             $kind,
-            ['{name}' => $kind->getName()]
+            ['{name}' => $this->getObjectName($kind)]
         );
     }
 
@@ -288,5 +289,29 @@ class KindManager
         }
 
         return $this->options->getNamespace();
+    }
+
+    private function getObjectName(object $model): string
+    {
+        $objectRef = new \ReflectionClass($model);
+
+        try {
+            $method = $objectRef->getMethod('getName');
+            $name = $method->invoke($model);
+        } catch (\ReflectionException $exception) {
+            throw new RuntimeException(sprintf(
+                'Unable to determine name for model: %s',
+                get_class($model)
+            ));
+        }
+
+        if (!is_string($name)) {
+            throw new RuntimeException(sprintf(
+                'Unable to determine name for model: %s',
+                get_class($model)
+            ));
+        }
+
+        return $name;
     }
 }

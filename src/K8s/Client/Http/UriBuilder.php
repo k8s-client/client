@@ -28,10 +28,7 @@ class UriBuilder
         $this->options = $options;
     }
 
-    /**
-     * @param array|object $query
-     */
-    public function buildUri(string $uri, array $parameters = [], $query = [], ?string $namespace = null): string
+    public function buildUri(string $uri, array $parameters = [], array $query = [], ?string $namespace = null): string
     {
         $namespace = $namespace ?? $this->options->getNamespace();
         $parameters['{namespace}'] = $namespace;
