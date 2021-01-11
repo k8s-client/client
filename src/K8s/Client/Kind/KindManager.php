@@ -230,13 +230,13 @@ class KindManager
     }
 
     /**
-     * @param class-string|object|null $object
+     * @param class-string|object $object
      * @return mixed
      */
     private function execute(
         string $action,
         array $options,
-        $object = null,
+        $object,
         array $params = []
     ) {
         $metadata = $this->metadataCache->get(is_object($object) ? get_class($object) : $object);

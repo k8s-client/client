@@ -27,8 +27,8 @@ class KubernetesException extends Exception
     {
         $this->status = $status;
         parent::__construct(
-            $status->getMessage(),
-            $status->getCode()
+            (string)$status->getMessage(),
+            (int)$status->getCode()
         );
     }
 }
