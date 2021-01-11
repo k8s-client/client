@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Metadata;
+namespace unit\K8s\Client\Metadata;
 
 use K8s\Client\Metadata\KindMetadata;
 use K8s\Core\Annotation\Kind;

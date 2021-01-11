@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Http\ResponseHandler;
+namespace unit\K8s\Client\Http\ResponseHandler;
 
 use K8s\Client\Http\ResponseHandler\SuccessHandler;
 use K8s\Client\Serialization\Serializer;

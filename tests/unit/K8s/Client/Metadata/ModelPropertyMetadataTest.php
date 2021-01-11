@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Metadata;
+namespace unit\K8s\Client\Metadata;
 
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Client\Metadata\ModelPropertyMetadata;

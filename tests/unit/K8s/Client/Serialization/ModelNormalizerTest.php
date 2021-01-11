@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Serialization;
+namespace unit\K8s\Client\Serialization;
 
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;

@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Metadata;
+namespace unit\K8s\Client\Metadata;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use K8s\Api\Model\Api\Core\v1\Pod;

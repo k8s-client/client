@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace unit\K8s\Http;
+namespace unit\K8s\Client\Http;
 
 use K8s\Client\Http\Contract\ResponseHandlerInterface;
 use K8s\Client\Http\HttpClient;
