@@ -88,7 +88,6 @@ class PodExecService
      */
     public function command($command): self
     {
-        /** @todo array of strings not being handled correctly when building up the query string... */
         $this->options['command'] = $command;
 
         return $this;
