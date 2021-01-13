@@ -69,7 +69,7 @@ class UriBuilder
             foreach ($arrayParams as $key => $values) {
                 unset($query[$key]);
                 foreach ($values as $value) {
-                    $additional[] = urlencode($key) . '[]=' . urlencode($value);
+                    $additional[] = urlencode($key) . '=' . urlencode($value);
                 }
             }
         }

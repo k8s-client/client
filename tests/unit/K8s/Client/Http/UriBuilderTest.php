@@ -69,13 +69,13 @@ class UriBuilderTest extends TestCase
     {
         $result = $this->subject->buildUri('/foo', [], ['command' => ['foo', 'bar']], 'stuff');
 
-        $this->assertEquals('https://foo.local:8443/foo?command[]=foo&command[]=bar', $result);
+        $this->assertEquals('https://foo.local:8443/foo?command=foo&command=bar', $result);
     }
 
     public function testItAddsQueryParamsThatAreArraysAndNotArraysToTheUri(): void
     {
         $result = $this->subject->buildUri('/foo', [], ['bar' => true, 'command' => ['foo', 'bar']], 'stuff');
 
-        $this->assertEquals('https://foo.local:8443/foo?bar=1&command[]=foo&command[]=bar', $result);
+        $this->assertEquals('https://foo.local:8443/foo?bar=1&command=foo&command=bar', $result);
     }
 }
