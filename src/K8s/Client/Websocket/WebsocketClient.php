@@ -20,6 +20,8 @@ use K8s\Client\Websocket\FrameHandler\GenericHandler;
 
 class WebsocketClient
 {
+    private const SUB_PROTOCOL = 'channel.k8s.io';
+
     /**
      * @var WebsocketClientInterface
      */
@@ -56,6 +58,6 @@ class WebsocketClient
                 $frameHandler = new GenericHandler($handler);
         }
 
-        $this->adapter->connect('channel.k8s.io', $request, $frameHandler);
+        $this->adapter->connect(self::SUB_PROTOCOL, $request, $frameHandler);
     }
 }
