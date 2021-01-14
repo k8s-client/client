@@ -107,9 +107,9 @@ class K8s
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      * @return object Typically the Status object on success.
      */
-    public function deleteNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
+    public function deleteAllNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
     {
-        return $this->factory->makeKindManager()->deleteNamespaced(
+        return $this->factory->makeKindManager()->deleteAllNamespaced(
             $kindFqcn,
             $query,
             $namespace

@@ -99,13 +99,13 @@ class KindManager
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      * @return object Typically the Status object on success.
      */
-    public function deleteNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
+    public function deleteAllNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
     {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
 
         return $this->execute(
-            'deletecollection-all',
+            'deletecollection',
             $options,
             $kindFqcn
         );
@@ -123,7 +123,7 @@ class KindManager
         $options['query'] = $query;
 
         return $this->execute(
-            'deletecollection',
+            'deletecollection-all',
             $options,
             $kindFqcn
         );
