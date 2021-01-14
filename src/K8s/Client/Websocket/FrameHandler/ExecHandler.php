@@ -15,7 +15,7 @@ namespace K8s\Client\Websocket\FrameHandler;
 
 use K8s\Client\Exception\InvalidArgumentException;
 use K8s\Client\Websocket\ExecConnection;
-use K8s\Core\Websocket\Contract\ContainerExecInterface;
+use K8s\Client\Websocket\Contract\ContainerExecInterface;
 use K8s\Core\Exception\WebsocketException;
 use K8s\Core\Websocket\Frame;
 use K8s\Core\Websocket\Contract\FrameHandlerInterface;

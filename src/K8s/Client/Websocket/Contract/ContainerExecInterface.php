@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace K8s\Core\Websocket\Contract;
+namespace K8s\Client\Websocket\Contract;
 
 use K8s\Client\Websocket\ExecConnection;
 
