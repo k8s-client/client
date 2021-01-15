@@ -115,6 +115,7 @@ class MetadataCache
         $path = null;
 
         foreach (self::MODEL_PATHS as $modelPath) {
+            $modelPath = str_replace('/', DIRECTORY_SEPARATOR, $modelPath);
             if (file_exists($modelPath)) {
                 $path = $modelPath;
                 break;
