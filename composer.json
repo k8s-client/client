@@ -63,7 +63,7 @@
       "phpstan analyse"
     ],
     "test-unit": [
-      "phpunit --testsuite unit"
+      "phpunit --testsuite unit --coverage-clover coverage.xml"
     ],
     "test-integration": [
       "phpunit --testsuite integration"

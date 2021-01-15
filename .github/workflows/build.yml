@@ -68,4 +68,8 @@ jobs:
           restore-keys: ${{ runner.os }}-composer-
 
       - name: Run Tests
-        run: composer tests-unit
+        run: composer test-unit
+
+      - uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage.xml
