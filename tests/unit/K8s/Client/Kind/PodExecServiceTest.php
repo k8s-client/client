@@ -15,7 +15,7 @@ namespace unit\K8s\Client\Kind;
 
 use K8s\Api\Service\Core\v1\PodExecOptionsService;
 use K8s\Client\Kind\PodExecService;
-use K8s\Core\Websocket\Contract\ContainerExecInterface;
+use K8s\Client\Websocket\Contract\ContainerExecInterface;
 use unit\K8s\Client\TestCase;
 
 class PodExecServiceTest extends TestCase
