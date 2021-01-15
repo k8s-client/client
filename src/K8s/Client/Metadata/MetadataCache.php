@@ -139,12 +139,18 @@ class MetadataCache
             if (substr($file->getPathname(), -4) !== '.php') {
                 continue;
             }
-            preg_match('/(\/Model\/.*).php$/', $file->getPathname(), $matches);
+            $ds = '\\' . DIRECTORY_SEPARATOR;
+            preg_match("/(" . $ds . "Model" . $ds . ".*).php$/", $file->getPathname(), $matches);
             if (!isset($matches[1])) {
                 continue;
             }
             /** @var class-string $fqcn */
-            $fqcn = 'K8s\\Api' . str_replace(DIRECTORY_SEPARATOR, '\\', $matches[1]);
+            $fqcn = 'K8s\\Api';
+            if (DIRECTORY_SEPARATOR === '/') {
+                $fqcn .= str_replace(DIRECTORY_SEPARATOR, '\\', $matches[1]);
+            } else {
+                $fqcn .= $matches[1];
+            }
 
             $class = new \ReflectionClass($fqcn);
             $classKind = $reader->getClassAnnotation($class, Kind::class);
