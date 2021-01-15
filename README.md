@@ -1,4 +1,4 @@
-# k8s-client
+# k8s-client ![](https://github.com/ChadSikorra/k8s-client/workflows/Build/badge.svg) [![codecov](https://codecov.io/gh/ChadSikorra/k8s-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ChadSikorra/k8s-client)
 
 k8s-client is a Kubernetes API client for PHP. The Kubernetes resource models and services used by this library are auto-generated
 from the OpenAPI spec of the Kubernetes API. This library provides an easy way of using those models / services from different
