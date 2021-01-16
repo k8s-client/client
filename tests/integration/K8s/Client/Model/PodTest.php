@@ -65,7 +65,7 @@ class PodTest extends TestCase
         $podList = $this->k8s()->listNamespaced(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
-        $this->assertCount(1, $podList->getItems());
+        $this->assertGreaterThanOrEqual(1, count($podList->getItems()));
         foreach ($podList as $pod) {
             $this->assertInstanceOf(Pod::class, $pod);
             $this->assertNotEmpty($pod->getName());
