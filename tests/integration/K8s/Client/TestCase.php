@@ -62,6 +62,8 @@ class TestCase extends BaseTestCase
         ]);
         $this->options = new Options(getenv('K8S_ENDPOINT'));
         $this->options->setToken(getenv('K8S_ACCESS_TOKEN'));
+        $this->options->setHttpClient($this->httpClient);
+        $this->options->setWebsocketClient($this->websocket);
         $this->client = new K8s($this->options);
     }
 }
