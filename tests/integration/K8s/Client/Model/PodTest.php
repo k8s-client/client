@@ -11,7 +11,7 @@
 
 declare(strict_types=1);
 
-namespace integration\K8s\Client\Models;
+namespace integration\K8s\Client\Model;
 
 use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
@@ -19,7 +19,7 @@ use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\Api\Core\v1\PodList;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 
-class PodsTest extends TestCase
+class PodTest extends TestCase
 {
     public function testItCanCreatePods(): void
     {
