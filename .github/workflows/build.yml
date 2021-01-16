@@ -95,6 +95,8 @@ jobs:
       - name: Configure Kubernetes Access Token
         id: minikube
         run: |
+          minikube update-context
+          minikube addons enable ingress
           K8S_SECRET_NAME=$(kubectl get serviceaccount default -o jsonpath='{.secrets[0].name}')
           K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -o jsonpath='{.data.token}' | base64 --decode)
           K8S_IP=$(minikube ip)
