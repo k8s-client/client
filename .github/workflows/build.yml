@@ -98,9 +98,10 @@ jobs:
         run: |
           minikube update-context
           minikube addons enable ingress
-          kubectl create clusterrolebinding minikube-admin --clusterrole=cluster-admin--serviceaccount=default:default
-          K8S_SECRET_NAME=$(kubectl get serviceaccount default -o jsonpath='{.secrets[0].name}')
-          K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -o jsonpath='{.data.token}' | base64 --decode)
+          kubectl create sa admin -n default
+          kubectl create clusterrolebinding default-admin --clusterrole=cluster-admin--serviceaccount=default:admin -n default
+          K8S_SECRET_NAME=$(kubectl get serviceaccount admin -n default -o jsonpath='{.secrets[0].name}')
+          K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -n default -o jsonpath='{.data.token}' | base64 --decode)
           K8S_IP=$(minikube ip)
           K8S_ENDPOINT="https\:\/\/${K8S_IP}\:8443"
           sed -i "s/{{K8S_ACCESS_TOKEN}}/$K8S_ACCESS_TOKEN/g" phpunit.xml.dist
