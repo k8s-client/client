@@ -51,9 +51,8 @@ class PodLogServiceTest extends TestCase
             ->sinceSeconds(2400)
             ->follow(function (string $data) use (&$results) {
                 $results[] = $data;
-                if (count($results) > 1) {
-                    return false;
-                }
+
+                return false;
             });
 
         $this->assertNotEmpty($results);
