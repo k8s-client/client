@@ -89,13 +89,18 @@ class TestCase extends BaseTestCase
     {
         $iterations = 0;
 
+        $list = null;
         do {
+            if ($list !== null && $iterations > self::MAX_WAIT_ITERATIONS) {
+                throw new \RuntimeException(sprintf(
+                    'Max iterations reached for test. Total kind %s out of %s.',
+                    count(iterator_to_array($list)),
+                    $count
+                ));
+            }
             sleep(1);
             $list = $this->client->listNamespaced($fqcn);
             $iterations++;
-            if ($iterations > self::MAX_WAIT_ITERATIONS) {
-                throw new \RuntimeException('Max iterations reached for test.');
-            }
         } while (iterator_to_array($list) < $count);
     }
 
@@ -103,13 +108,17 @@ class TestCase extends BaseTestCase
     {
         $iterations = 0;
 
+        $list = null;
         do {
+            if ($list !== null && $iterations > self::MAX_WAIT_ITERATIONS) {
+                throw new \RuntimeException(sprintf(
+                    'Max iterations reached for test. Remaining kind: %s',
+                    count(iterator_to_array($list))
+                ));
+            }
             sleep(1);
             $list = $this->client->listNamespaced($fqcn);
             $iterations++;
-            if ($iterations > self::MAX_WAIT_ITERATIONS) {
-                throw new \RuntimeException('Max iterations reached for test.');
-            }
         } while (iterator_to_array($list) > 0);
     }
 }
