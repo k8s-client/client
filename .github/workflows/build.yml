@@ -90,6 +90,7 @@ jobs:
         with:
           minikube version: 'v1.16.0'
           kubernetes version: ${{ matrix.kubernetes-versions }}
+          driver: docker
           github token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Kubernetes Access Token
