@@ -15,6 +15,7 @@ namespace integration\K8s\Client;
 
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
+use K8s\Client\Exception\KubernetesException;
 use K8s\Client\K8s;
 use K8s\Client\Options;
 use K8s\WsRatchet\RatchetWebsocketAdapter;
@@ -93,13 +94,12 @@ class TestCase extends BaseTestCase
         do {
             if ($list !== null && $iterations > self::MAX_WAIT_ITERATIONS) {
                 throw new \RuntimeException(sprintf(
-                    'Max iterations reached for test. Total kind %s out of %s.',
-                    count(iterator_to_array($list)),
-                    $count
+                    'Max iterations reached for test. Remaining kind: %s',
+                    count(iterator_to_array($list))
                 ));
             }
             sleep(1);
-            $list = $this->client->listNamespaced($fqcn, [], $namespace);
+            $list = $this->k8s()->listNamespaced($fqcn, [], $namespace);
             $iterations++;
         } while (count(iterator_to_array($list)) < $count);
     }
@@ -117,8 +117,48 @@ class TestCase extends BaseTestCase
                 ));
             }
             sleep(1);
-            $list = $this->client->listNamespaced($fqcn);
+            $list = $this->k8s()->listNamespaced($fqcn);
             $iterations++;
         } while (count(iterator_to_array($list)) > 0);
+    }
+
+    public function createAndWaitForPod(Pod $pod): void
+    {
+        try {
+            $thePod = $this->k8s()->read($pod->getName(), Pod::class);
+            if ($thePod->getPhase() === 'Running') {
+                return;
+            }
+        } catch (KubernetesException $exception) {
+        }
+
+        $this->k8s()->create($pod);
+
+        $thePod = null;
+        $iterations = 0;
+        while (true) {
+            if ($thePod !== null && $iterations > self::MAX_WAIT_ITERATIONS) {
+                throw new \RuntimeException(sprintf(
+                    'Max iterations reached waiting for pod %s to be ready.',
+                    $pod->getName()
+                ));
+            }
+            sleep(1);
+            try {
+                /** @var Pod $thePod */
+                $thePod = $this->k8s()->read($pod->getName(), Pod::class);
+                if ($thePod->getPhase() === 'Running') {
+                    break;
+                }
+            } catch (KubernetesException $e) {
+                $iterations++;
+                continue;
+            }
+        }
+    }
+
+    public function k8s(): K8s
+    {
+        return $this->client;
     }
 }

@@ -29,7 +29,7 @@ class PodTest extends TestCase
         );
 
         /** @var Pod $newPod */
-        $newPod = $this->client->create($pod);
+        $newPod = $this->k8s()->create($pod);
 
         $this->assertInstanceOf(Pod::class, $newPod);
         $this->assertEquals('test-pod', $newPod->getName());
@@ -40,7 +40,7 @@ class PodTest extends TestCase
     public function testItCanReadPods(): void
     {
         /** @var Pod $newPod */
-        $pod = $this->client->read('test-pod', Pod::class);
+        $pod = $this->k8s()->read('test-pod', Pod::class);
 
         $this->assertInstanceOf(Pod::class, $pod);
         $this->assertEquals('test-pod', $pod->getName());
@@ -49,7 +49,7 @@ class PodTest extends TestCase
     public function testItCanListPods(): void
     {
         /** @var PodList $podList */
-        $podList = $this->client->listAll(Pod::class);
+        $podList = $this->k8s()->listAll(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
         $this->assertGreaterThan(0, count($podList->getItems()));
@@ -62,7 +62,7 @@ class PodTest extends TestCase
     public function testItCanListNamespacedPods(): void
     {
         /** @var PodList $podList */
-        $podList = $this->client->listNamespaced(Pod::class);
+        $podList = $this->k8s()->listNamespaced(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
         $this->assertCount(1, $podList->getItems());
@@ -75,8 +75,8 @@ class PodTest extends TestCase
     public function testItCanDeletePods(): void
     {
         /** @var Pod $deleted */
-        $pod = $this->client->read('test-pod', Pod::class);
-        $deleted = $this->client->delete($pod);
+        $pod = $this->k8s()->read('test-pod', Pod::class);
+        $deleted = $this->k8s()->delete($pod);
 
         $this->assertInstanceOf(Pod::class, $deleted);
         $this->assertEquals('test-pod', $deleted->getName());
@@ -88,9 +88,9 @@ class PodTest extends TestCase
         $this->createPods('test', 3);
         $this->waitForKind(Pod::class, 3);
 
-        $this->client->deleteAllNamespaced(Pod::class);
+        $this->k8s()->deleteAllNamespaced(Pod::class);
         $this->waitForEmptyKind(Pod::class);
-        $podList = $this->client->listNamespaced(Pod::class);
+        $podList = $this->k8s()->listNamespaced(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
         $this->assertCount(0, $podList->getItems());
@@ -102,7 +102,7 @@ class PodTest extends TestCase
         $this->waitForKind(Pod::class, 5);
 
         $results = [];
-        $this->client->watchNamespaced(function (WatchEvent $event) use (&$results) {
+        $this->k8s()->watchNamespaced(function (WatchEvent $event) use (&$results) {
             $results[] = $event;
             if (count($results) === 5) {
                 return false;
@@ -120,7 +120,7 @@ class PodTest extends TestCase
     {
         $results = [];
 
-        $this->client->watchAll(function (WatchEvent $event) use (&$results) {
+        $this->k8s()->watchAll(function (WatchEvent $event) use (&$results) {
             $results[] = $event;
             if (count($results) === 5) {
                 return false;
