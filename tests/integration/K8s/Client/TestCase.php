@@ -85,7 +85,7 @@ class TestCase extends BaseTestCase
         }
     }
 
-    public function waitForKind(string $fqcn, int $count): void
+    public function waitForKind(string $fqcn, int $count, ?string $namespace = null): void
     {
         $iterations = 0;
 
@@ -99,7 +99,7 @@ class TestCase extends BaseTestCase
                 ));
             }
             sleep(1);
-            $list = $this->client->listNamespaced($fqcn);
+            $list = $this->client->listNamespaced($fqcn, [], $namespace);
             $iterations++;
         } while (count(iterator_to_array($list)) < $count);
     }

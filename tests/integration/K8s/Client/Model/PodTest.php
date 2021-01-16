@@ -115,4 +115,22 @@ class PodTest extends TestCase
             $this->assertInstanceOf(Pod::class, $result->getObject());
         }
     }
+
+    public function testItCanWatchAllPods(): void
+    {
+        $results = [];
+
+        $this->client->watchAll(function (WatchEvent $event) use (&$results) {
+            $results[] = $event;
+            if (count($results) === 5) {
+                return false;
+            }
+        }, Pod::class);
+
+        $this->assertGreaterThanOrEqual(5, $results);
+        /** @var WatchEvent $result */
+        foreach ($results as $result) {
+            $this->assertInstanceOf(Pod::class, $result->getObject());
+        }
+    }
 }
