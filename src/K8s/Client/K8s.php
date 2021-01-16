@@ -52,11 +52,16 @@ class K8s
      *
      * @param object $kind Any Kind model object.
      * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace to create it in (uses default from options if not defined).
      * @return object
      */
-    public function create(object $kind, $query = []): object
+    public function create(object $kind, $query = [], ?string $namespace = null): object
     {
-        return $this->factory->makeKindManager()->create($kind, $query);
+        return $this->factory->makeKindManager()->create(
+            $kind,
+            $query,
+            $namespace
+        );
     }
 
     /**
@@ -68,7 +73,10 @@ class K8s
      */
     public function delete(object $kind, $query = []): object
     {
-        return $this->factory->makeKindManager()->delete($kind, $query);
+        return $this->factory->makeKindManager()->delete(
+            $kind,
+            $query
+        );
     }
 
     /**
@@ -81,7 +89,11 @@ class K8s
      */
     public function read(string $name, string $kindFqcn, $query = []): object
     {
-        return $this->factory->makeKindManager()->read($name, $kindFqcn, $query);
+        return $this->factory->makeKindManager()->read(
+            $name,
+            $kindFqcn,
+            $query
+        );
     }
 
     /**

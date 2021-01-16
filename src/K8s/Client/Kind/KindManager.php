@@ -59,11 +59,13 @@ class KindManager
      *
      * @param object $kind Any Kind model object.
      * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace to create it in (uses default from options if not defined).
      * @return object
      */
-    public function create(object $kind, $query = []): object
+    public function create(object $kind, $query = [], ?string $namespace = null): object
     {
         $options['query'] = $query;
+        $options['namespace'] = $namespace;
 
         return $this->execute(
             'post',
