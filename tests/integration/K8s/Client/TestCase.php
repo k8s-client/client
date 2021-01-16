@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace integration\K8s\Client;
 
+use K8s\Api\Model\Api\Core\v1\Container;
+use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Client\K8s;
 use K8s\Client\Options;
 use K8s\WsRatchet\RatchetWebsocketAdapter;
@@ -65,5 +67,19 @@ class TestCase extends BaseTestCase
         $this->options->setHttpClient($this->httpClient);
         $this->options->setWebsocketClient($this->websocket);
         $this->client = new K8s($this->options);
+    }
+
+    public function createPods(
+        string $baseName,
+        int $count,
+        string $image = 'nginx:latest',
+        ?string $namespace = null
+    ): void {
+        for ($i = 0; $i < $count; $i++) {
+            $this->client->create(new Pod(
+                "$baseName-$i",
+                [new Container("$baseName-$i", $image)]
+            ), [], $namespace);
+        }
     }
 }

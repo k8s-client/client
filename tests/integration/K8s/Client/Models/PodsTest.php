@@ -17,6 +17,7 @@ use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\Api\Core\v1\PodList;
+use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 
 class PodsTest extends TestCase
 {
@@ -84,12 +85,7 @@ class PodsTest extends TestCase
 
     public function testItCanDeleteNamespacedPods(): void
     {
-        for ($i = 0; $i < 3; $i++) {
-            $this->client->create(new Pod(
-                "test-pod-$i",
-                [new Container('test-pod', 'nginx:latest')]
-            ));
-        }
+        $this->createPods('test', 3);
 
         $this->client->deleteAllNamespaced(Pod::class);
         /** @var PodList $podList */
@@ -97,5 +93,24 @@ class PodsTest extends TestCase
 
         $this->assertInstanceOf(PodList::class, $podList);
         $this->assertCount(0, $podList->getItems());
+    }
+
+    public function testItCanWatchNamespacedPods(): void
+    {
+        $this->createPods('test', 5);
+
+        $results = [];
+        $this->client->watchNamespaced(function (WatchEvent $event) use (&$results) {
+            $results[] = $event;
+            if (count($results) === 5) {
+                return false;
+            }
+        }, Pod::class);
+
+        $this->assertCount(5, $results);
+        /** @var WatchEvent $result */
+        foreach ($results as $result) {
+            $this->assertInstanceOf(Pod::class, $result->getObject());
+        }
     }
 }
