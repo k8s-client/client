@@ -77,7 +77,7 @@ jobs:
       fail-fast: false
       matrix:
         php-versions: ['7.4']
-        kubernetes-versions: ['v1.15.12', 'v1.16.15', 'v1.17.12', 'v1.18.9', 'v1.19.7', 'v1.20.2']
+        kubernetes-versions: ['v1.18.9', 'v1.19.7', 'v1.20.2']
     name: Integration Tests for PHP ${{ matrix.php-versions }} on Kubernetes ${{ matrix.kubernetes-versions }}
     steps:
       - name: Checkout
