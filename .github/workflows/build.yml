@@ -98,6 +98,7 @@ jobs:
         run: |
           minikube update-context
           minikube addons enable ingress
+          kubectl create clusterrolebinding minikube-admin --clusterrole=cluster-admin--serviceaccount=default:default
           K8S_SECRET_NAME=$(kubectl get serviceaccount default -o jsonpath='{.secrets[0].name}')
           K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -o jsonpath='{.data.token}' | base64 --decode)
           K8S_IP=$(minikube ip)
