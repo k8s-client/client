@@ -24,6 +24,8 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class TestCase extends BaseTestCase
 {
+    private const MAX_WAIT_ITERATIONS = 30;
+
     /**
      * @var RatchetWebsocketAdapter
      */
@@ -85,9 +87,29 @@ class TestCase extends BaseTestCase
 
     public function waitForKind(string $fqcn, int $count): void
     {
+        $iterations = 0;
+
         do {
             sleep(1);
             $list = $this->client->listNamespaced($fqcn);
-        } while (iterator_to_array($list) < 3);
+            $iterations++;
+            if ($iterations > self::MAX_WAIT_ITERATIONS) {
+                throw new \RuntimeException('Max iterations reached for test.');
+            }
+        } while (iterator_to_array($list) < $count);
+    }
+
+    public function waitForEmptyKind(string $fqcn): void
+    {
+        $iterations = 0;
+
+        do {
+            sleep(1);
+            $list = $this->client->listNamespaced($fqcn);
+            $iterations++;
+            if ($iterations > self::MAX_WAIT_ITERATIONS) {
+                throw new \RuntimeException('Max iterations reached for test.');
+            }
+        } while (iterator_to_array($list) > 0);
     }
 }

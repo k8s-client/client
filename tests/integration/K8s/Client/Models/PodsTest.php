@@ -89,6 +89,7 @@ class PodsTest extends TestCase
         $this->waitForKind(Pod::class, 3);
 
         $this->client->deleteAllNamespaced(Pod::class);
+        $this->waitForEmptyKind(Pod::class);
         $podList = $this->client->listNamespaced(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
