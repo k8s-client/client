@@ -82,4 +82,12 @@ class TestCase extends BaseTestCase
             ), [], $namespace);
         }
     }
+
+    public function waitForKind(string $fqcn, int $count): void
+    {
+        do {
+            sleep(1);
+            $list = $this->client->listNamespaced($fqcn);
+        } while (iterator_to_array($list) < 3);
+    }
 }

@@ -86,9 +86,9 @@ class PodsTest extends TestCase
     public function testItCanDeleteNamespacedPods(): void
     {
         $this->createPods('test', 3);
+        $this->waitForKind(Pod::class, 3);
 
         $this->client->deleteAllNamespaced(Pod::class);
-        /** @var PodList $podList */
         $podList = $this->client->listNamespaced(Pod::class);
 
         $this->assertInstanceOf(PodList::class, $podList);
@@ -98,6 +98,7 @@ class PodsTest extends TestCase
     public function testItCanWatchNamespacedPods(): void
     {
         $this->createPods('test', 5);
+        $this->waitForKind(Pod::class, 5);
 
         $results = [];
         $this->client->watchNamespaced(function (WatchEvent $event) use (&$results) {
