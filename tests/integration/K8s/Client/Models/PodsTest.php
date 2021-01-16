@@ -81,4 +81,21 @@ class PodsTest extends TestCase
         $this->assertEquals('test-pod', $deleted->getName());
         $this->assertNotNull($deleted->getDeletionTimestamp());
     }
+
+    public function testItCanDeleteNamespacedPods(): void
+    {
+        for ($i = 0; $i < 3; $i++) {
+            $this->client->create(new Pod(
+                "test-pod-$i",
+                [new Container('test-pod', 'nginx:latest')]
+            ));
+        }
+
+        $this->client->deleteAllNamespaced(Pod::class);
+        /** @var PodList $podList */
+        $podList = $this->client->listNamespaced(Pod::class);
+
+        $this->assertInstanceOf(PodList::class, $podList);
+        $this->assertCount(0, $podList->getItems());
+    }
 }
