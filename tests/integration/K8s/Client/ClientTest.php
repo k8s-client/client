@@ -22,7 +22,7 @@ class ClientTest extends TestCase
     {
         $pod = new Pod(
             'test-pod',
-            [new Container('test-pod', 'nginix:latest')]
+            [new Container('test-pod', 'nginx:latest')]
         );
 
         /** @var Pod $newPod */
