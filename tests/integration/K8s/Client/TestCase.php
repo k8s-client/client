@@ -101,7 +101,7 @@ class TestCase extends BaseTestCase
             sleep(1);
             $list = $this->client->listNamespaced($fqcn);
             $iterations++;
-        } while (iterator_to_array($list) < $count);
+        } while (count(iterator_to_array($list)) < $count);
     }
 
     public function waitForEmptyKind(string $fqcn): void
@@ -119,6 +119,6 @@ class TestCase extends BaseTestCase
             sleep(1);
             $list = $this->client->listNamespaced($fqcn);
             $iterations++;
-        } while (iterator_to_array($list) > 0);
+        } while (count(iterator_to_array($list)) > 0);
     }
 }
