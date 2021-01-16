@@ -101,7 +101,7 @@ jobs:
           K8S_SECRET_NAME=$(kubectl get serviceaccount default -o jsonpath='{.secrets[0].name}')
           K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -o jsonpath='{.data.token}' | base64 --decode)
           K8S_IP=$(minikube ip)
-          K8S_ENDPOINT="https://${K8S_IP}:8443"
+          K8S_ENDPOINT="https\:\/\/${K8S_IP}\:8443"
           sed -i "s/{{K8S_ACCESS_TOKEN}}/$K8S_ACCESS_TOKEN/g" phpunit.xml.dist
           sed -i "s/{{K8S_ENDPOINT}}/$K8S_ENDPOINT/g" phpunit.xml.dist
 
