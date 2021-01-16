@@ -11,12 +11,13 @@
 
 declare(strict_types=1);
 
-namespace integration\K8s\Client;
+namespace integration\K8s\Client\Models;
 
+use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
 
-class ClientTest extends TestCase
+class PodsTest extends TestCase
 {
     public function testItCanCreatePods(): void
     {
@@ -32,5 +33,25 @@ class ClientTest extends TestCase
         $this->assertEquals('test-pod', $newPod->getName());
         $this->assertCount(1, $newPod->getContainers());
         $this->assertEquals('nginx:latest', $pod->getContainers()[0]->getImage());
+    }
+
+    public function testItCanReadPods(): void
+    {
+        /** @var Pod $newPod */
+        $pod = $this->client->read('test-pod', Pod::class);
+
+        $this->assertInstanceOf(Pod::class, $pod);
+        $this->assertEquals('test-pod', $pod->getName());
+    }
+
+    public function testItCanDeletePods(): void
+    {
+        /** @var Pod $deleted */
+        $pod = $this->client->read('test-pod', Pod::class);
+        $deleted = $this->client->delete($pod);
+
+        $this->assertInstanceOf(Pod::class, $deleted);
+        $this->assertEquals('test-pod', $deleted->getName());
+        $this->assertNotNull($deleted->getDeletionTimestamp());
     }
 }
