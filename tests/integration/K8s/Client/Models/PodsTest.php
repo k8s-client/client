@@ -16,6 +16,7 @@ namespace integration\K8s\Client\Models;
 use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
+use K8s\Api\Model\Api\Core\v1\PodList;
 
 class PodsTest extends TestCase
 {
@@ -42,6 +43,32 @@ class PodsTest extends TestCase
 
         $this->assertInstanceOf(Pod::class, $pod);
         $this->assertEquals('test-pod', $pod->getName());
+    }
+
+    public function testItCanListPods(): void
+    {
+        /** @var PodList $podList */
+        $podList = $this->client->listAll(Pod::class);
+
+        $this->assertInstanceOf(PodList::class, $podList);
+        $this->assertGreaterThan(0, count($podList->getItems()));
+        foreach ($podList as $pod) {
+            $this->assertInstanceOf(Pod::class, $pod);
+            $this->assertNotEmpty($pod->getName());
+        }
+    }
+
+    public function testItCanListNamespacedPods(): void
+    {
+        /** @var PodList $podList */
+        $podList = $this->client->listNamespaced(Pod::class);
+
+        $this->assertInstanceOf(PodList::class, $podList);
+        $this->assertCount(1, $podList->getItems());
+        foreach ($podList as $pod) {
+            $this->assertInstanceOf(Pod::class, $pod);
+            $this->assertNotEmpty($pod->getName());
+        }
     }
 
     public function testItCanDeletePods(): void
