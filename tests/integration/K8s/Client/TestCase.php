@@ -24,7 +24,7 @@ use Symfony\Component\HttpClient\HttpClient;
 
 class TestCase extends BaseTestCase
 {
-    private const MAX_WAIT_ITERATIONS = 30;
+    private const MAX_WAIT_ITERATIONS = 60;
 
     /**
      * @var RatchetWebsocketAdapter
