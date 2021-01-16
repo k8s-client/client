@@ -72,4 +72,60 @@ jobs:
 
       - uses: codecov/codecov-action@v1
         with:
-          files: ./coverage.xml
+          files: ./coverage-unit.xml
+  integration-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php-versions: ['7.2', '7.3', '7.4', '8.0']
+        kubernetes-versions: ['v1.15.12', 'v1.16.15', 'v1.17.12', 'v1.18.9', 'v1.19.7', 'v1.20.2']
+    name: Integration Tests for PHP ${{ matrix.php-versions }} on Kubernetes ${{ matrix.kubernetes-versions }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Minikube
+        uses: manusa/actions-setup-minikube@v2.3.0
+        with:
+          minikube version: 'v1.16.0'
+          kubernetes version: ${{ matrix.kubernetes-versions }}
+          github token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Kubernetes Access Token
+        id: minikube
+        run: |
+          K8S_SECRET_NAME=$(kubectl get serviceaccount default -o jsonpath='{.secrets[0].name}')
+          K8S_ACCESS_TOKEN=$(kubectl get secret $K8S_SECRET_NAME -o jsonpath='{.data.token}' | base64 --decode)"
+          K8S_IP=$(minikube ip)
+          K8S_ENDPOINT="https://${K8S_IP}:8443"
+          sed -i "s/{{K8S_ACCESS_TOKEN}}/$K8S_ACCESS_TOKEN/g" phpunit.xml.dist
+          sed -i "s/{{K8S_ENDPOINT}}/$K8S_ENDPOINT/g" phpunit.xml.dist
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-versions }}
+          tools: composer:v2
+          extension: openssl,mbstring
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: echo "::set-output name=dir::$(composer config cache-files-dir)"
+
+      - name: Install Composer dependencies
+        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+
+      - name: Cache dependencies
+        uses: actions/cache@v1
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Run Tests
+        run: composer test-integration
+
+      - uses: codecov/codecov-action@v1
+        with:
+          files: ./coverage-integration.xml

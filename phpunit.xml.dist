@@ -25,4 +25,8 @@
         </testsuite>
     </testsuites>
 
+    <php>
+        <env name="K8S_ACCESS_TOKEN" value="{{K8S_ACCESS_TOKEN}}" force="true" />
+        <env name="K8S_ENDPOINT" value="{{K8S_ENDPOINT}}" force="true" />
+    </php>
 </phpunit>

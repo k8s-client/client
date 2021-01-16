@@ -51,7 +51,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "unit\\K8s\\Client\\": "tests/unit/K8s/Client"
+      "unit\\K8s\\Client\\": "tests/unit/K8s/Client",
+      "integration\\K8s\\Client\\": "tests/integration/K8s/Client"
     }
   },
   "scripts": {
@@ -63,10 +64,10 @@
       "phpstan analyse"
     ],
     "test-unit": [
-      "phpunit --testsuite unit --coverage-clover coverage.xml"
+      "phpunit --testsuite unit --coverage-clover coverage-unit.xml"
     ],
     "test-integration": [
-      "phpunit --testsuite integration"
+      "phpunit --testsuite integration --coverage-clover coverage-integration.xml"
     ]
   }
 }
