@@ -43,9 +43,6 @@ class DeploymentTest extends TestCase
 
         $this->assertInstanceOf(Deployment::class, $deployment);
         $this->assertEquals('test-deployment', $deployment->getName());
-        $this->assertEquals(2, $deployment->getReplicas());
-        $this->assertCount(1, $deployment->getTemplate()->getContainers());
-        $this->assertEquals('nginx:latest', $deployment->getTemplate()->getContainers()[0]->getImage());
     }
 
     public function testItCanReadDeployments(): void
