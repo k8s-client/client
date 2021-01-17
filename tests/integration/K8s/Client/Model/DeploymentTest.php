@@ -21,6 +21,7 @@ use K8s\Api\Model\Api\Core\v1\PodTemplateSpec;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\LabelSelector;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\Status;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Exception\KubernetesException;
 
 class DeploymentTest extends TestCase
 {
@@ -140,10 +141,12 @@ class DeploymentTest extends TestCase
         /** @var Deployment $deployment */
         $deployment = $this->k8s()->read('test-deployment', Deployment::class);
         $deleted = $this->k8s()->delete($deployment);
-        $deployment = $this->k8s()->read('test-deployment', Deployment::class);
 
         $this->assertInstanceOf(Status::class, $deleted);
         $this->assertNotNull($deployment->getDeletionTimestamp());
+        $this->expectException(KubernetesException::class);
+        $this->expectExceptionMessageMatches('/not found/');
+        $this->k8s()->read('test-deployment', Deployment::class);
     }
 
     public function testItCanDeleteNamespacedDeployments(): void
