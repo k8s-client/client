@@ -72,30 +72,6 @@ class PodTest extends TestCase
         }
     }
 
-    public function testItCanDeletePods(): void
-    {
-        /** @var Pod $deleted */
-        $pod = $this->k8s()->read('test-pod', Pod::class);
-        $deleted = $this->k8s()->delete($pod);
-
-        $this->assertInstanceOf(Pod::class, $deleted);
-        $this->assertEquals('test-pod', $deleted->getName());
-        $this->assertNotNull($deleted->getDeletionTimestamp());
-    }
-
-    public function testItCanDeleteNamespacedPods(): void
-    {
-        $this->createPods('test', 3);
-        $this->waitForKind(Pod::class, 3);
-
-        $this->k8s()->deleteAllNamespaced(Pod::class);
-        $this->waitForEmptyKind(Pod::class);
-        $podList = $this->k8s()->listNamespaced(Pod::class);
-
-        $this->assertInstanceOf(PodList::class, $podList);
-        $this->assertCount(0, $podList->getItems());
-    }
-
     public function testItCanWatchNamespacedPods(): void
     {
         $this->createPods('test', 5);
@@ -131,6 +107,29 @@ class PodTest extends TestCase
         /** @var WatchEvent $result */
         foreach ($results as $result) {
             $this->assertInstanceOf(Pod::class, $result->getObject());
+        }
+    }
+
+    public function testItCanDeletePods(): void
+    {
+        /** @var Pod $deleted */
+        $pod = $this->k8s()->read('test-pod', Pod::class);
+        $deleted = $this->k8s()->delete($pod);
+
+        $this->assertInstanceOf(Pod::class, $deleted);
+        $this->assertEquals('test-pod', $deleted->getName());
+        $this->assertNotNull($deleted->getDeletionTimestamp());
+    }
+
+    public function testItCanDeleteNamespacedPods(): void
+    {
+        $this->createPods('test', 3);
+        $this->waitForKind(Pod::class, 3);
+
+        $this->k8s()->deleteAllNamespaced(Pod::class);
+        /** @var Pod $pod */
+        foreach ($this->k8s()->listNamespaced(Pod::class) as $pod) {
+            $this->assertNotNull($pod->getDeletionTimestamp());
         }
     }
 }
