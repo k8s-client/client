@@ -123,10 +123,8 @@ class PodTest extends TestCase
 
     public function testItCanDeleteNamespacedPods(): void
     {
-        $this->createPods('test', 3);
-        $this->waitForKind(Pod::class, 3);
-
         $this->k8s()->deleteAllNamespaced(Pod::class);
+
         /** @var Pod $pod */
         foreach ($this->k8s()->listNamespaced(Pod::class) as $pod) {
             $this->assertNotNull($pod->getDeletionTimestamp());
