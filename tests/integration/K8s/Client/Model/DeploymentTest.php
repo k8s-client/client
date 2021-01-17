@@ -21,7 +21,6 @@ use K8s\Api\Model\Api\Core\v1\PodTemplateSpec;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\LabelSelector;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\Status;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
-use K8s\Client\Exception\KubernetesException;
 
 class DeploymentTest extends TestCase
 {
