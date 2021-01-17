@@ -39,12 +39,8 @@ class DeploymentTest extends TestCase
         );
         $deployment->setReplicas(2);
 
-        /** @var Status $status */
-        $status = $this->k8s()->create($deployment);
-        /** @var Deployment $deployment */
-        $deployment = $this->k8s()->read($deployment->getName(), Deployment::class);
+        $deployment = $this->k8s()->create($deployment);
 
-        $this->assertInstanceOf(Status::class, $status);
         $this->assertInstanceOf(Deployment::class, $deployment);
         $this->assertEquals('test-deployment', $deployment->getName());
         $this->assertEquals(2, $deployment->getReplicas());
