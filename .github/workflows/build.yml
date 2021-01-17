@@ -116,7 +116,12 @@ jobs:
         run: echo "::set-output name=dir::$(composer config cache-files-dir)"
 
       - name: Install Composer dependencies
-        run: composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+        env:
+          K8S_VERSION: ${{ matrix.kubernetes-versions }}
+        run: |
+          composer install --no-progress --no-suggest --prefer-dist --optimize-autoloader
+          API_VERSION="~$(echo $K8S_VERSION | sed 's/\.[^.]*$//; s/^v//;').0"
+          composer require -n k8s/api:"$API_VERSION"
 
       - name: Cache dependencies
         uses: actions/cache@v1
