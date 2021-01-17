@@ -61,7 +61,7 @@ class DeploymentTest extends TestCase
         $this->assertEquals('test-deployment', $deployment->getName());
     }
 
-    public function testItCanListPods(): void
+    public function testItCanListDeployments(): void
     {
         /** @var DeploymentList $deploymentList */
         $deploymentList = $this->k8s()->listAll(Deployment::class);
@@ -74,7 +74,7 @@ class DeploymentTest extends TestCase
         }
     }
 
-    public function testItCanListNamespacedPods(): void
+    public function testItCanListNamespacedDeployments(): void
     {
         /** @var DeploymentList $deploymentList */
         $deploymentList = $this->k8s()->listNamespaced(Deployment::class);
@@ -146,7 +146,7 @@ class DeploymentTest extends TestCase
         $this->assertNotNull($deployment->getDeletionTimestamp());
     }
 
-    public function testItCanDeleteNamespacedPods(): void
+    public function testItCanDeleteNamespacedDeployments(): void
     {
         $this->k8s()->deleteAllNamespaced(Deployment::class);
 
