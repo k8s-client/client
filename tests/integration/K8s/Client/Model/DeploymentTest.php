@@ -143,19 +143,12 @@ class DeploymentTest extends TestCase
         $deleted = $this->k8s()->delete($deployment);
 
         $this->assertInstanceOf(Status::class, $deleted);
-        $this->assertNotNull($deployment->getDeletionTimestamp());
-        $this->expectException(KubernetesException::class);
-        $this->expectExceptionMessageMatches('/not found/');
-        $this->k8s()->read('test-deployment', Deployment::class);
     }
 
     public function testItCanDeleteNamespacedDeployments(): void
     {
-        $this->k8s()->deleteAllNamespaced(Deployment::class);
+        $status = $this->k8s()->deleteAllNamespaced(Deployment::class);
 
-        /** @var Deployment $deployment */
-        foreach ($this->k8s()->listNamespaced(Deployment::class) as $deployment) {
-            $this->assertNotNull($deployment->getDeletionTimestamp());
-        }
+        $this->assertInstanceOf(Status::class, $status);
     }
 }
