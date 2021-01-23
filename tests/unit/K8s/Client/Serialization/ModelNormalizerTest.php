@@ -35,7 +35,7 @@ class ModelNormalizerTest extends TestCase
     {
         parent::setUp();
         $this->cache = new MetadataCache();
-        $this->subject = new ModelNormalizer();
+        $this->subject = new ModelNormalizer($this->cache);
     }
 
     public function testNormalize(): void
@@ -49,8 +49,7 @@ class ModelNormalizerTest extends TestCase
 
         $result = $this->subject->normalize(
             $pod,
-            Pod::class,
-            $this->cache
+            Pod::class
         );
         $this->assertEquals(
             [

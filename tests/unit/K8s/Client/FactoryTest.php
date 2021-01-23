@@ -21,6 +21,8 @@ use K8s\Client\Http\UriBuilder;
 use K8s\Client\Kind\KindManager;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Options;
+use K8s\Client\Serialization\Contract\DenormalizerInterface;
+use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Client\Serialization\Serializer;
 use K8s\Client\Websocket\WebsocketClientFactory;
 use K8s\Core\Contract\ApiInterface;
@@ -99,5 +101,19 @@ class FactoryTest extends TestCase
         $result = $this->subject->makeMetadataCache();
 
         $this->assertInstanceOf(MetadataCache::class, $result);
+    }
+
+    public function testItMakesTheNormalizer(): void
+    {
+        $result = $this->subject->makeNormalizer();
+
+        $this->assertInstanceOf(NormalizerInterface::class, $result);
+    }
+
+    public function testItMakesTheDenormalizer(): void
+    {
+        $result = $this->subject->makeDenormalizer();
+
+        $this->assertInstanceOf(DenormalizerInterface::class, $result);
     }
 }

@@ -12,6 +12,10 @@ use K8s\Client\Http\UriBuilder;
 use K8s\Client\Kind\KindManager;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Metadata\MetadataParser;
+use K8s\Client\Serialization\Contract\DenormalizerInterface;
+use K8s\Client\Serialization\Contract\NormalizerInterface;
+use K8s\Client\Serialization\ModelDenormalizer;
+use K8s\Client\Serialization\ModelNormalizer;
 use K8s\Client\Serialization\Serializer;
 use K8s\Api\Service\ServiceFactory;
 use K8s\Client\Websocket\WebsocketClientFactory;
@@ -68,6 +72,16 @@ class Factory
     private $api;
 
     /**
+     * @var NormalizerInterface|null
+     */
+    private $normalizer;
+
+    /**
+     * @var DenormalizerInterface|null
+     */
+    private $denormalizer;
+
+    /**
      * @var Options
      */
     private $options;
@@ -87,6 +101,26 @@ class Factory
         return $this->serviceFactory;
     }
 
+    public function makeNormalizer(): NormalizerInterface
+    {
+        if ($this->normalizer) {
+            return $this->normalizer;
+        }
+        $this->normalizer = new ModelNormalizer($this->makeMetadataCache());
+
+        return $this->normalizer;
+    }
+
+    public function makeDenormalizer(): DenormalizerInterface
+    {
+        if ($this->denormalizer) {
+            return $this->denormalizer;
+        }
+        $this->denormalizer = new ModelDenormalizer($this->makeMetadataCache());
+
+        return $this->denormalizer;
+    }
+
     public function makeSerializer(): Serializer
     {
         if ($this->serializer) {
@@ -94,10 +128,8 @@ class Factory
         }
 
         $this->serializer = new Serializer(
-            new MetadataCache(
-                new MetadataParser(),
-                $this->options->getCache()
-            )
+            $this->makeNormalizer(),
+            $this->makeDenormalizer()
         );
 
         return $this->serializer;

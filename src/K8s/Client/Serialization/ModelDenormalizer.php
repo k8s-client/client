@@ -14,19 +14,30 @@ declare(strict_types=1);
 namespace K8s\Client\Serialization;
 
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Serialization\Contract\DenormalizerInterface;
 use K8s\Core\Collection;
 use K8s\Client\Metadata\MetadataCache;
 use ReflectionClass;
 use ReflectionObject;
 
-class ModelDenormalizer
+class ModelDenormalizer implements DenormalizerInterface
 {
+    /**
+     * @var MetadataCache
+     */
+    private $cache;
+
+    public function __construct(MetadataCache $cache)
+    {
+        $this->cache = $cache;
+    }
+
     /**
      * @param class-string $modelFqcn
      */
-    public function denormalize(array $data, string $modelFqcn, MetadataCache $cache): object
+    public function denormalize(array $data, string $modelFqcn): object
     {
-        $metadata = $cache->get($modelFqcn);
+        $metadata = $this->cache->get($modelFqcn);
 
         $instance = (new ReflectionClass($modelFqcn))->newInstanceWithoutConstructor();
         $instanceRef = new ReflectionObject($instance);
@@ -42,16 +53,15 @@ class ModelDenormalizer
             if ($property->isCollection()) {
                 $collectionModel = $property->getModelFqcn();
 
-                $value = array_map(function (array $item) use ($collectionModel, $cache) {
-                    return $this->denormalize($item, $collectionModel, $cache);
+                $value = array_map(function (array $item) use ($collectionModel) {
+                    return $this->denormalize($item, $collectionModel);
                 }, $value);
 
                 $value = new Collection($value);
             } elseif ($property->isModel()) {
                 $value = $this->denormalize(
                     $value,
-                    $property->getModelFqcn(),
-                    $cache
+                    $property->getModelFqcn()
                 );
             } elseif ($property->isDateTime()) {
                 $value = new \DateTimeImmutable($value);
@@ -59,8 +69,7 @@ class ModelDenormalizer
             } elseif ($modelFqcn === WatchEvent::class && $property->getName() === 'object') {
                 $value = $this->denormalize(
                     $value,
-                    $cache->getModelFqcnFromKind($value['apiVersion'], $value['kind']),
-                    $cache
+                    $this->cache->getModelFqcnFromKind($value['apiVersion'], $value['kind'])
                 );
             }
 

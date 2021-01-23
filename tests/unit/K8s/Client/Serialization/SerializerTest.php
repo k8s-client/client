@@ -14,7 +14,6 @@ declare(strict_types=1);
 namespace unit\K8s\Client\Serialization;
 
 use K8s\Api\Model\Api\Core\v1\Pod;
-use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Serialization\ModelDenormalizer;
 use K8s\Client\Serialization\ModelNormalizer;
 use K8s\Client\Serialization\Serializer;
@@ -22,11 +21,6 @@ use unit\K8s\Client\TestCase;
 
 class SerializerTest extends TestCase
 {
-    /**
-     * @var MetadataCache|\Mockery\LegacyMockInterface|\Mockery\MockInterface
-     */
-    private $cache;
-
     /**
      * @var ModelNormalizer|\Mockery\LegacyMockInterface|\Mockery\MockInterface
      */
@@ -45,11 +39,9 @@ class SerializerTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->cache = \Mockery::spy(MetadataCache::class);
         $this->normalizer = \Mockery::spy(ModelNormalizer::class);
         $this->denormalizer = \Mockery::spy(ModelDenormalizer::class);
         $this->subject = new Serializer(
-            $this->cache,
             $this->normalizer,
             $this->denormalizer
         );
@@ -76,7 +68,7 @@ class SerializerTest extends TestCase
     {
         $pod = new Pod(null, []);
         $this->denormalizer->shouldReceive('denormalize')
-            ->with(['pod' => 'data'], Pod::class, $this->cache)
+            ->with(['pod' => 'data'], Pod::class)
             ->andReturn($pod);
 
         $result = $this->subject->deserialize('{"pod":"data"}', Pod::class);

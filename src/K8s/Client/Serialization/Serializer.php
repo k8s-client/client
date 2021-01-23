@@ -13,34 +13,28 @@ declare(strict_types=1);
 
 namespace K8s\Client\Serialization;
 
+use K8s\Client\Serialization\Contract\DenormalizerInterface;
+use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Core\Exception\Exception;
-use K8s\Client\Metadata\MetadataCache;
 
 class Serializer
 {
     /**
-     * @var MetadataCache
-     */
-    private $metadataCache;
-
-    /**
-     * @var ModelNormalizer|null
+     * @var NormalizerInterface
      */
     private $normalizer;
 
     /**
-     * @var ModelDenormalizer|null
+     * @var DenormalizerInterface
      */
     private $denormalizer;
 
     public function __construct(
-        ?MetadataCache $metadataCache = null,
-        ?ModelNormalizer $normalizer = null,
-        ?ModelDenormalizer $denormalizer = null
+        NormalizerInterface $normalizer,
+        DenormalizerInterface $denormalizer
     ) {
-        $this->metadataCache = $metadataCache ?? new MetadataCache();
-        $this->normalizer = $normalizer ?? new ModelNormalizer();
-        $this->denormalizer = $denormalizer ?? new ModelDenormalizer();
+        $this->normalizer = $normalizer;
+        $this->denormalizer = $denormalizer;
     }
 
     /**
@@ -51,8 +45,7 @@ class Serializer
         if (!is_array($data)) {
             $data = $this->normalizer->normalize(
                 $data,
-                get_class($data),
-                $this->metadataCache
+                get_class($data)
             );
         }
 
@@ -75,8 +68,7 @@ class Serializer
 
         return $this->denormalizer->denormalize(
             $data,
-            $model,
-            $this->metadataCache
+            $model
         );
     }
 }

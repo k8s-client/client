@@ -14,19 +14,30 @@ declare(strict_types=1);
 namespace K8s\Client\Serialization;
 
 use K8s\Client\Metadata\MetadataCache;
+use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Core\Collection;
 use DateTimeInterface;
 
-class ModelNormalizer
+class ModelNormalizer implements NormalizerInterface
 {
+    /**
+     * @var MetadataCache
+     */
+    private $cache;
+
+    public function __construct(MetadataCache $cache)
+    {
+        $this->cache = $cache;
+    }
+
     /**
      * @param object $model
      * @param class-string $modelFqcn
      */
-    public function normalize($model, string $modelFqcn, MetadataCache $cache): array
+    public function normalize($model, string $modelFqcn): array
     {
         $data = [];
-        $metadata = $cache->get($modelFqcn);
+        $metadata = $this->cache->get($modelFqcn);
 
         $instanceRef = new \ReflectionObject($model);
         foreach ($metadata->getProperties() as $property) {
@@ -43,15 +54,13 @@ class ModelNormalizer
             if ($property->isModel()) {
                 $data[$property->getName()] = $this->normalize(
                     $phpValue,
-                    $property->getModelFqcn(),
-                    $cache
+                    $property->getModelFqcn()
                 );
             } elseif ($property->isCollection() && !empty($phpValue)) {
-                $data[$property->getName()] = array_map(function (object $item) use ($cache, $property) {
+                $data[$property->getName()] = array_map(function (object $item) use ($property) {
                     return $this->normalize(
                         $item,
-                        $property->getModelFqcn(),
-                        $cache
+                        $property->getModelFqcn()
                     );
                 }, iterator_to_array($phpValue));
             } elseif ($property->isDateTime() && $phpValue instanceof DateTimeInterface) {

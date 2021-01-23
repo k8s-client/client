@@ -34,7 +34,7 @@ class ModelDenormalizerTest extends TestCase
     {
         parent::setUp();
         $this->cache = new MetadataCache();
-        $this->subject = new ModelDenormalizer();
+        $this->subject = new ModelDenormalizer($this->cache);
     }
 
     public function testItDenormalizes(): void
@@ -56,8 +56,7 @@ class ModelDenormalizerTest extends TestCase
         ];
         $result = $this->subject->denormalize(
             $data,
-            Pod::class,
-            $this->cache
+            Pod::class
         );
 
         $this->assertInstanceOf(Pod::class, $result);
