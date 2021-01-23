@@ -16,6 +16,7 @@ namespace K8s\Client\Http;
 use K8s\Client\Exception\InvalidArgumentException;
 use K8s\Core\Exception\HttpException;
 use K8s\Client\Serialization\Serializer;
+use K8s\Core\PatchInterface;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 
@@ -66,23 +67,30 @@ class HttpClient
         $model = $options['model'] ?? null;
         $body = $options['body'] ?? null;
 
+        $encodedBody = null;
         if ($body) {
-            $body = $this->serializer->serialize($body);
+            $encodedBody = $this->serializer->serialize(
+                ($body instanceof PatchInterface) ? $body->toArray() : $body
+            );
         }
 
-        if (!(is_string($body) || is_null($body))) {
-            throw new InvalidArgumentException(sprintf(
-                'The body sent to the API must be a string or null, got: %s',
-                gettype($body)
-            ));
+        $contentType = null;
+        if ($body instanceof PatchInterface) {
+            $contentType = $body->getContentType();
+        }
+
+        $acceptType = null;
+        if ($model) {
+            $acceptType = RequestFactory::CONTENT_TYPE_JSON;
         }
 
         try {
             $request = $this->requestFactory->makeRequest(
                 $uri,
                 $action,
-                $model ? RequestFactory::CONTENT_TYPE_JSON : null,
-                $body
+                $acceptType,
+                $encodedBody,
+                $contentType
             );
 
             $response = $this->client->sendRequest($request);

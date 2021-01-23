@@ -16,6 +16,7 @@ namespace K8s\Client;
 use K8s\Api\Service\ServiceFactory;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
+use K8s\Core\PatchInterface;
 
 class K8s
 {
@@ -174,6 +175,23 @@ class K8s
         return $this->factory->makeKindManager()->listAll(
             $kindFqcn,
             $query
+        );
+    }
+
+    /**
+     * @param object $kind Any Kind model object.
+     * @param PatchInterface $patch A patch class object.
+     * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
+     * @return object This would typically be the same object passed in as the Kind.
+     */
+    public function patch(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
+    {
+        return $this->factory->makeKindManager()->patch(
+            $kind,
+            $patch,
+            $query,
+            $namespace
         );
     }
 

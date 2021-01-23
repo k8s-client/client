@@ -65,7 +65,8 @@ class RequestFactory
         string $uri,
         string $action,
         ?string $acceptType = null,
-        ?string $body = null
+        ?string $body = null,
+        ?string $contentType = null
     ): RequestInterface {
         $httpMethod = self::ACTION_MAP[$action] ?? null;
 
@@ -85,7 +86,7 @@ class RequestFactory
                 ->withBody($this->streamFactory->createStream($body))
                 ->withHeader(
                     'Content-type',
-                    self::CONTENT_TYPE_JSON
+                    $contentType ?? self::CONTENT_TYPE_JSON
                 );
         }
 

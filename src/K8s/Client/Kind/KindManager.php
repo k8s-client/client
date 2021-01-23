@@ -18,6 +18,7 @@ use K8s\Client\Http\HttpClient;
 use K8s\Client\Http\UriBuilder;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Options;
+use K8s\Core\PatchInterface;
 use ReflectionClass;
 
 class KindManager
@@ -87,6 +88,27 @@ class KindManager
 
         return $this->execute(
             'delete',
+            $options,
+            $kind,
+            ['{name}' => $this->getObjectName($kind)]
+        );
+    }
+
+    /**
+     * @param object $kind Any Kind model object.
+     * @param PatchInterface $patch A patch class object.
+     * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
+     * @return object This would typically be the same object passed in as the Kind.
+     */
+    public function patch(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
+    {
+        $options['query'] = $query;
+        $options['namespace'] = $namespace;
+        $options['body'] = $patch;
+
+        return $this->execute(
+            'patch',
             $options,
             $kind,
             ['{name}' => $this->getObjectName($kind)]
@@ -245,7 +267,7 @@ class KindManager
         $operation = $metadata->getOperationByType($action);
 
         if ($operation->isBodyRequired()) {
-            $options['body'] = $object;
+            $options['body'] = $options['body'] ?? $object;
         }
         if ($operation->isResponseSelf()) {
             $options['model'] = $metadata->getModelFqcn();
