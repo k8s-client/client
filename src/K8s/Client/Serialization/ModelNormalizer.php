@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace K8s\Client\Serialization;
 
 use K8s\Client\Metadata\MetadataCache;
+use K8s\Client\Metadata\ModelPropertyMetadata;
 use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Core\Collection;
 use DateTimeInterface;
@@ -50,26 +51,38 @@ class ModelNormalizer implements NormalizerInterface
             if ($phpValue instanceof Collection && $phpValue->isEmpty()) {
                 continue;
             }
-
-            if ($property->isModel()) {
-                $data[$property->getName()] = $this->normalize(
-                    $phpValue,
-                    $property->getModelFqcn()
-                );
-            } elseif ($property->isCollection() && !empty($phpValue)) {
-                $data[$property->getName()] = array_map(function (object $item) use ($property) {
-                    return $this->normalize(
-                        $item,
-                        $property->getModelFqcn()
-                    );
-                }, iterator_to_array($phpValue));
-            } elseif ($property->isDateTime() && $phpValue instanceof DateTimeInterface) {
-                $data[$property->getName()] = $phpValue->format(DATE_ISO8601);
-            } else {
-                $data[$property->getName()] = $phpValue;
-            }
+            $data[$property->getName()] = $this->normalizeValue(
+                $property,
+                $phpValue
+            );
         }
 
         return $data;
+    }
+
+    /**
+     * @param ModelPropertyMetadata $property
+     * @param mixed $value
+     * @return mixed
+     */
+    private function normalizeValue(ModelPropertyMetadata $property, $value)
+    {
+        if ($property->isModel()) {
+            return $this->normalize(
+                $value,
+                $property->getModelFqcn()
+            );
+        } elseif ($property->isCollection() && !empty($value)) {
+            return array_map(function (object $item) use ($property) {
+                return $this->normalize(
+                    $item,
+                    $property->getModelFqcn()
+                );
+            }, iterator_to_array($value));
+        } elseif ($property->isDateTime() && $value instanceof DateTimeInterface) {
+            return $value->format(DATE_ISO8601);
+        }
+
+        return $value;
     }
 }
