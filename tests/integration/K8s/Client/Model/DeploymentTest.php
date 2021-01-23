@@ -21,6 +21,7 @@ use K8s\Api\Model\Api\Core\v1\PodTemplateSpec;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\LabelSelector;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\Status;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Patch\JsonPatch;
 
 class DeploymentTest extends TestCase
 {
@@ -52,6 +53,21 @@ class DeploymentTest extends TestCase
 
         $this->assertInstanceOf(Deployment::class, $deployment);
         $this->assertEquals('test-deployment', $deployment->getName());
+    }
+
+    public function testItCanPatchDeployments(): void
+    {
+        /** @var Deployment $deployment */
+        $deployment = $this->k8s()->read('test-deployment', Deployment::class);
+
+        $patch = new JsonPatch();
+        $patch->replace('/spec/replicas', 1);
+
+        $deployment = $this->k8s()->patch($deployment, $patch);
+
+        $this->assertInstanceOf(Deployment::class, $deployment);
+        $this->assertEquals('test-deployment', $deployment->getName());
+        $this->assertEquals(1, $deployment->getReplicas());
     }
 
     public function testItCanListDeployments(): void

@@ -222,3 +222,31 @@ $k8s->exec('web', '/usr/bin/whoami')
         ) . PHP_EOL;
     });
 ```
+
+### Patch a Deployment
+
+```php
+use K8s\Api\Model\Api\Apps\v1\Deployment;
+use K8s\Client\K8s;
+use K8s\Client\Patch\JsonPatch;
+use K8s\Client\Options;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+$patch = new JsonPatch();
+# Since labels are an array, this actually replaces existing labels
+$patch->add('/metadata/labels', ['app' => 'web']);
+# Replaces the current replica value with 2
+$patch->replace('/spec/replicas', 2);
+
+# We first need to read the deployment we want to patch.
+$deployment = $k8s->read('frontend', Deployment::class);
+# Now we patch the deployment using the patch object. The returned value will be the updated deployment.
+$deployment = $k8s->patch($deployment, $patch);
+
+echo sprintf(
+    'Replicas: %s, Labels: %s',
+    $deployment->getReplicas(),
+    implode(',', $deployment->getLabels())
+) . PHP_EOL;
+```
