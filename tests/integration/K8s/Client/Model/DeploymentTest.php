@@ -62,12 +62,13 @@ class DeploymentTest extends TestCase
 
         $patch = new JsonPatch();
         $patch->replace('/spec/replicas', 1);
+        $patch->add('/metadata/labels', ['test' => 'patch']);
 
         $deployment = $this->k8s()->patch($deployment, $patch);
 
         $this->assertInstanceOf(Deployment::class, $deployment);
         $this->assertEquals('test-deployment', $deployment->getName());
-        $this->assertEquals(1, $deployment->getReplicas());
+        $this->assertEquals(['test' => 'patch'], $deployment->getLabels());
     }
 
     public function testItCanListDeployments(): void
