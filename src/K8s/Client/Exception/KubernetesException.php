@@ -31,4 +31,9 @@ class KubernetesException extends Exception
             (int)$status->getCode()
         );
     }
+
+    public function getStatus(): Status
+    {
+        return $this->status;
+    }
 }
