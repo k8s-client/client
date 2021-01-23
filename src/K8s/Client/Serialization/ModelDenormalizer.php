@@ -13,7 +13,9 @@ declare(strict_types=1);
 
 namespace K8s\Client\Serialization;
 
+use Exception;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Metadata\ModelPropertyMetadata;
 use K8s\Client\Serialization\Contract\DenormalizerInterface;
 use K8s\Core\Collection;
 use K8s\Client\Metadata\MetadataCache;
@@ -49,33 +51,49 @@ class ModelDenormalizer implements DenormalizerInterface
             $phpProperty = $instanceRef->getProperty($property->getName());
             $phpProperty->setAccessible(true);
 
-            $value = $data[$property->getAttributeName()];
-            if ($property->isCollection()) {
-                $collectionModel = $property->getModelFqcn();
-
-                $value = array_map(function (array $item) use ($collectionModel) {
-                    return $this->denormalize($item, $collectionModel);
-                }, $value);
-
-                $value = new Collection($value);
-            } elseif ($property->isModel()) {
-                $value = $this->denormalize(
-                    $value,
-                    $property->getModelFqcn()
-                );
-            } elseif ($property->isDateTime()) {
-                $value = new \DateTimeImmutable($value);
-            // Hacky solution, but we can guess the object type in this case
-            } elseif ($modelFqcn === WatchEvent::class && $property->getName() === 'object') {
-                $value = $this->denormalize(
-                    $value,
-                    $this->cache->getModelFqcnFromKind($value['apiVersion'], $value['kind'])
-                );
-            }
+            $value = $this->denormalizeValue(
+                $modelFqcn,
+                $property,
+                $data[$property->getAttributeName()]
+            );
 
             $phpProperty->setValue($instance, $value);
         }
 
         return $instance;
+    }
+
+    /**
+     * @param class-string $modelFqcn
+     * @param mixed $value
+     * @return mixed
+     * @throws Exception
+     */
+    private function denormalizeValue(string $modelFqcn, ModelPropertyMetadata $property, $value)
+    {
+        if ($property->isCollection()) {
+            $collectionModel = $property->getModelFqcn();
+
+            $value = array_map(function (array $item) use ($collectionModel) {
+                return $this->denormalize($item, $collectionModel);
+            }, $value);
+
+            $value = new Collection($value);
+        } elseif ($property->isModel()) {
+            $value = $this->denormalize(
+                $value,
+                $property->getModelFqcn()
+            );
+        } elseif ($property->isDateTime()) {
+            $value = new \DateTimeImmutable($value);
+        // Hacky solution, but we can guess the object type in this case
+        } elseif ($modelFqcn === WatchEvent::class && $property->getName() === 'object') {
+            $value = $this->denormalize(
+                $value,
+                $this->cache->getModelFqcnFromKind($value['apiVersion'], $value['kind'])
+            );
+        }
+
+        return $value;
     }
 }
