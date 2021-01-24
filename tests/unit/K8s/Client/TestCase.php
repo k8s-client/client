@@ -19,4 +19,9 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 class TestCase extends BaseTestCase
 {
     use MockeryPHPUnitIntegration;
+
+    public function isWindowsPlatform(): bool
+    {
+        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+    }
 }

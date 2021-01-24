@@ -62,6 +62,9 @@ class TarTest extends TestCase
 
     public function testItDeletesTheArchiveIfItExists(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('The Phar archive has sporadic timing issues on Windows.');
+        }
         $this->subject->addFromString('/foo.txt', 'data');
         $this->subject->delete();
 
@@ -70,6 +73,9 @@ class TarTest extends TestCase
 
     public function testItIgnoresDeletingTheArchiveIfItDoesNotExist(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('The Phar archive has sporadic timing issues on Windows.');
+        }
         $this->subject->addFromString('/foo.txt', 'data');
         unlink($this->tmpFile);
         $this->subject->delete();
