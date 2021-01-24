@@ -37,7 +37,8 @@ class FileUploadExecHandler implements ContainerExecInterface
         while (!$this->stream->eof()) {
             $connection->write($this->stream->read(self::READ_BYTES));
         }
-        $connection->close();;
+        $connection->close();
+        ;
     }
 
     public function onClose(): void
