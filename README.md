@@ -250,3 +250,22 @@ echo sprintf(
     implode(',', $deployment->getLabels())
 ) . PHP_EOL;
 ```
+
+### Upload Files to a Pod
+
+```php
+use K8s\Client\K8s;
+use K8s\Client\Options;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+$k8s->fileUploader('my-pod')
+    # Add files from paths.
+    # The first argument is the source location, the second is the destination for it on the container.
+    ->addFile('/path/to/local/file.txt', '/tmp/file.txt')
+    # Add files from string data.
+    # The first argument is the destination path on the container. The second is the file contents as a string.
+    ->addFileFromString('/tmp/hi.txt', 'Oh, hi Mark.')
+    # This actually initiates the upload process.
+    ->upload();
+```
