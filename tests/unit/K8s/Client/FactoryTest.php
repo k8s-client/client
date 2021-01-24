@@ -15,6 +15,7 @@ namespace unit\K8s\Client;
 
 use K8s\Api\Service\ServiceFactory;
 use K8s\Client\Factory;
+use K8s\Client\File\ArchiveFactory;
 use K8s\Client\Http\HttpClient;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Http\UriBuilder;
@@ -26,6 +27,7 @@ use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Client\Serialization\Serializer;
 use K8s\Client\Websocket\WebsocketClientFactory;
 use K8s\Core\Contract\ApiInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class FactoryTest extends TestCase
 {
@@ -115,5 +117,19 @@ class FactoryTest extends TestCase
         $result = $this->subject->makeDenormalizer();
 
         $this->assertInstanceOf(DenormalizerInterface::class, $result);
+    }
+
+    public function testItMakesTheStreamFactory(): void
+    {
+        $result = $this->subject->makeStreamFactory();
+
+        $this->assertInstanceOf(StreamFactoryInterface::class, $result);
+    }
+
+    public function testItMakesTheArchiveFactory(): void
+    {
+        $result = $this->subject->makeArchiveFactory();
+
+        $this->assertInstanceOf(ArchiveFactory::class, $result);
     }
 }

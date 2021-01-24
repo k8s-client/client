@@ -24,11 +24,11 @@ use K8s\Core\Websocket\Contract\WebsocketConnectionInterface;
 class ExecHandler implements FrameHandlerInterface
 {
     private const CHANNELS = [
-        0 => 'stdin',
-        1 => 'stdout',
-        2 => 'stderr',
-        3 => 'error',
-        4 => 'resize',
+        0 => ExecConnection::CHANNEL_STDIN,
+        1 => ExecConnection::CHANNEL_STDOUT,
+        2 => ExecConnection::CHANNEL_STDERR,
+        3 => ExecConnection::CHANNEL_ERROR,
+        4 => ExecConnection::CHANNEL_RESIZE,
     ];
 
     /**

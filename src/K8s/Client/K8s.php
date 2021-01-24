@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace K8s\Client;
 
 use K8s\Api\Service\ServiceFactory;
+use K8s\Client\File\FileUploader;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
 use K8s\Core\PatchInterface;
@@ -247,5 +248,28 @@ class K8s
         }
 
         return $exec;
+    }
+
+    /**
+     * Upload files to a Pod.
+     *
+     * @param string $podName The pod name.
+     * @param string|null $source Optionally specify a file to upload.
+     * @param string|null $destination The destination for the file to upload.
+     * @return FileUploader
+     * @throws File\Exception\FileUploadException
+     */
+    public function fileUploader(string $podName, ?string $source = null, ?string $destination = null) : FileUploader
+    {
+        $fileUpload = new FileUploader(
+            $this->factory->makeArchiveFactory(),
+            $this->exec($podName)
+        );
+
+        if ($source !== null && $destination !== null) {
+            $fileUpload->addFile($source, $destination);
+        }
+
+        return $fileUpload;
     }
 }

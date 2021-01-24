@@ -18,6 +18,31 @@ use K8s\Core\Websocket\Contract\WebsocketConnectionInterface;
 class ExecConnection
 {
     /**
+     * Generic STDIN
+     */
+    public const CHANNEL_STDIN = 'stdin';
+
+    /**
+     * Generic STDOUT
+     */
+    public const CHANNEL_STDOUT = 'stdout';
+
+    /**
+     * Generic STDERR
+     */
+    public const CHANNEL_STDERR = 'stderr';
+
+    /**
+     * Sub-protocol error
+     */
+    public const CHANNEL_ERROR = 'error';
+
+    /**
+     * Sub-protocol resize
+     */
+    public const CHANNEL_RESIZE = 'resize';
+
+    /**
      * @var WebsocketConnectionInterface
      */
     private $websocket;
@@ -42,6 +67,19 @@ class ExecConnection
         foreach ($lines as $line) {
             $this->websocket->send($line);
         }
+
+        return $this;
+    }
+
+    /**
+     * Send arbitrary data through STDIN.
+     *
+     * @param string $data
+     * @return $this
+     */
+    public function write(string $data)
+    {
+        $this->websocket->send(chr(0) . $data);
 
         return $this;
     }

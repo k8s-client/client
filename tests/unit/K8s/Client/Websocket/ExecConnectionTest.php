@@ -36,10 +36,18 @@ class ExecConnectionTest extends TestCase
         $this->subject = new ExecConnection($this->connection);
     }
 
-    public function testWriteln(): void
+    public function testWrite(): void
     {
         $this->connection->shouldReceive('send')
             ->with("\x00foo");
+
+        $this->subject->write('foo');
+    }
+
+    public function testWriteln(): void
+    {
+        $this->connection->shouldReceive('send')
+            ->with("\x00foo\n");
 
         $this->subject->writeln('foo');
     }
@@ -47,9 +55,9 @@ class ExecConnectionTest extends TestCase
     public function testMultiWriteln(): void
     {
         $this->connection->shouldReceive('send')
-            ->with("\x00foo");
+            ->with("\x00foo\n");
         $this->connection->shouldReceive('send')
-            ->with("\x00bar");
+            ->with("\x00bar\n");
 
         $this->subject->writeln(['foo', 'bar']);
     }

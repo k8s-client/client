@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace K8s\Client;
 
 use K8s\Client\Exception\RuntimeException;
+use K8s\Client\File\ArchiveFactory;
 use K8s\Client\Http\Api;
 use K8s\Client\Http\HttpClient;
 use K8s\Client\Http\RequestFactory;
@@ -23,6 +24,7 @@ use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use K8s\Core\Contract\ApiInterface;
+use Psr\Http\Message\StreamFactoryInterface;
 
 class Factory
 {
@@ -80,6 +82,11 @@ class Factory
      * @var DenormalizerInterface|null
      */
     private $denormalizer;
+
+    /**
+     * @var ArchiveFactory|null
+     */
+    private $archiveFactory;
 
     /**
      * @var Options
@@ -157,7 +164,7 @@ class Factory
         try {
             $this->requestFactory = new RequestFactory(
                 $this->options->getHttpRequestFactory() ?? Psr17FactoryDiscovery::findRequestFactory(),
-                $this->options->getStreamFactory() ?? Psr17FactoryDiscovery::findStreamFactory(),
+                $this->makeStreamFactory(),
                 $this->options
             );
         } catch (NotFoundException $exception) {
@@ -169,6 +176,29 @@ class Factory
         }
 
         return $this->requestFactory;
+    }
+
+    public function makeStreamFactory(): StreamFactoryInterface
+    {
+        try {
+            return $this->options->getStreamFactory() ?? Psr17FactoryDiscovery::findStreamFactory();
+        } catch (NotFoundException $exception) {
+            throw new RuntimeException(
+                'You must install or provide a PSR-17 compatible stream factory.',
+                $exception->getCode(),
+                $exception
+            );
+        }
+    }
+
+    public function makeArchiveFactory(): ArchiveFactory
+    {
+        if ($this->archiveFactory) {
+            return $this->archiveFactory;
+        }
+        $this->archiveFactory = new ArchiveFactory($this->makeStreamFactory());
+
+        return $this->archiveFactory;
     }
 
     public function makeHttpClient(): HttpClient
