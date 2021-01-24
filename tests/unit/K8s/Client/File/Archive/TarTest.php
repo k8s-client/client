@@ -77,13 +77,6 @@ class TarTest extends TestCase
         $this->assertFalse(file_exists($this->tmpFile));
     }
 
-    public function testTheStreamCannotBeCreatedWhenNoFileExists(): void
-    {
-        $this->expectException(FileException::class);
-
-        $this->subject->toStream();
-    }
-
     public function testItHasTheCorrectUploadCommand(): void
     {
         $expected = [
