@@ -101,7 +101,7 @@ class TarTest extends TestCase
     {
         parent::tearDown();
         if (file_exists($this->tmpFile)) {
-            unlink($this->tmpFile);
+            @unlink($this->tmpFile);
         }
     }
 }
