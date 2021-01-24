@@ -15,7 +15,6 @@ namespace unit\K8s\Client\File\Archive;
 
 use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\File\Archive\Tar;
-use K8s\Client\File\Exception\FileException;
 use Psr\Http\Message\StreamInterface;
 use unit\K8s\Client\TestCase;
 
