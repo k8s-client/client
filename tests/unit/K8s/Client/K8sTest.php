@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client;
 
+use K8s\Client\File\FileDownloader;
 use K8s\Client\File\FileUploader;
 use K8s\Client\K8s;
 use K8s\Client\Kind\PodExecService;
@@ -51,5 +52,12 @@ class K8sTest extends TestCase
         $result = $this->subject->fileUploader('foo');
 
         $this->assertInstanceOf(FileUploader::class, $result);
+    }
+
+    public function testFileDownloaderReturnsFileDownloaderClass(): void
+    {
+        $result = $this->subject->fileDownloader('foo');
+
+        $this->assertInstanceOf(FileDownloader::class, $result);
     }
 }

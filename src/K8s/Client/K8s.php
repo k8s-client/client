@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace K8s\Client;
 
 use K8s\Api\Service\ServiceFactory;
+use K8s\Client\File\FileDownloader;
 use K8s\Client\File\FileUploader;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
@@ -271,5 +272,23 @@ class K8s
         }
 
         return $fileUpload;
+    }
+
+    /**
+     * Download files from a Pod.
+     *
+     * @param string $podName The pod name.
+     * @param string|string[] $path The path(s) to download from. Either a string path, or an array of paths.
+     * @return FileDownloader
+     */
+    public function fileDownloader(string $podName, $path = []): FileDownloader
+    {
+        $fileDownloader = new FileDownloader($this->exec($podName));
+
+        if (!empty($path)) {
+            $fileDownloader->from($path);
+        }
+
+        return $fileDownloader;
     }
 }

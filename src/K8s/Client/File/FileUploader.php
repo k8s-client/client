@@ -22,7 +22,7 @@ use Throwable;
 
 class FileUploader
 {
-    private const TEMP_FILE_PREFIX = 'k8s-client';
+    use FileTrait;
 
     /**
      * @var PodExecService
@@ -116,6 +116,7 @@ class FileUploader
             $execHandler = new FileUploadExecHandler($archive->toStream());
             $this->exec->useStdin()
                 ->useStdout()
+                ->useStderr()
                 ->useTty(false)
                 ->command($archive->getUploadCommand())
                 ->run(
@@ -146,12 +147,7 @@ class FileUploader
             return $this->archive;
         }
         try {
-            $this->archive = $this->archiveFactory->makeArchive(sprintf(
-                '%s%s%s.tar',
-                sys_get_temp_dir(),
-                DIRECTORY_SEPARATOR,
-                uniqid(self::TEMP_FILE_PREFIX)
-            ));
+            $this->archive = $this->archiveFactory->makeArchive($this->getTempFilename());
         } catch (Throwable $e) {
             throw new FileUploadException(
                 sprintf('Failed to create tar archive for upload: %s', $e->getMessage()),

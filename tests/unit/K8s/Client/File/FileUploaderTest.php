@@ -89,6 +89,8 @@ class FileUploaderTest extends TestCase
             ->andReturn($this->execService);
         $this->execService->shouldReceive('useTty')
             ->andReturn($this->execService);
+        $this->execService->shouldReceive('useStderr')
+            ->andReturn($this->execService);
 
         $this->subject->addFileFromString('/foo.txt', 'data');
         $this->subject->upload();
@@ -108,6 +110,8 @@ class FileUploaderTest extends TestCase
         $this->execService->shouldReceive('command')
             ->andReturn($this->execService);
         $this->execService->shouldReceive('useTty')
+            ->andReturn($this->execService);
+        $this->execService->shouldReceive('useStderr')
             ->andReturn($this->execService);
 
         $this->subject->useContainer('foo');
