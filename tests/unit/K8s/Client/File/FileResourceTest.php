@@ -51,6 +51,7 @@ class FileResourceTest extends TestCase
 
     public function testClose(): void
     {
+        $this->subject->write('foo');
         $this->subject->close();
 
         $this->assertTrue(file_exists($this->file));
