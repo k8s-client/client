@@ -37,6 +37,9 @@ class FileResourceTest extends TestCase
 
     public function testWrite(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
         $this->subject->write('foo');
 
         $this->assertEquals('foo', file_get_contents($this->file));
@@ -44,6 +47,9 @@ class FileResourceTest extends TestCase
 
     public function testDelete(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
         $this->subject->delete();
 
         $this->assertFalse(file_exists($this->file));
@@ -51,6 +57,9 @@ class FileResourceTest extends TestCase
 
     public function testClose(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
         $this->subject->write('foo');
         $this->subject->close();
 
