@@ -28,7 +28,7 @@ interface ArchiveInterface extends ArchiveUploadInterface
      * Extract the archive to a specific location.
      *
      * @param string $path the path to extract to.
-     * @param null $files The string file, or array of files, to extract. Defaults to all if not set.
+     * @param null|array|string $files The string file, or array of files, to extract. Defaults to all if not set.
      * @param bool $overwrite Whether or not to overwrite existing files.
      * @throws FileException
      */

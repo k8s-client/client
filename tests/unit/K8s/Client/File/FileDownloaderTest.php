@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client\File;
 
+use K8s\Client\File\ArchiveFactory;
+use K8s\Client\File\Contract\ArchiveInterface;
 use K8s\Client\File\FileDownloader;
 use K8s\Client\Kind\PodExecService;
 use unit\K8s\Client\TestCase;
@@ -25,6 +27,11 @@ class FileDownloaderTest extends TestCase
     private $exec;
 
     /**
+     * @var ArchiveFactory|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+     */
+    private $archiveFactory;
+
+    /**
      * @var FileDownloader
      */
     private $subject;
@@ -33,7 +40,11 @@ class FileDownloaderTest extends TestCase
     {
         parent::setUp();
         $this->exec = \Mockery::spy(PodExecService::class);
-        $this->subject = new FileDownloader($this->exec);
+        $this->archiveFactory = \Mockery::spy(ArchiveFactory::class);
+        $this->subject = new FileDownloader(
+            $this->exec,
+            $this->archiveFactory
+        );
     }
 
     public function testItDownloads(): void
@@ -61,7 +72,7 @@ class FileDownloaderTest extends TestCase
             "etc",
         ];
 
-        $this->assertInstanceOf(\PharData::class, $result);
+        $this->assertInstanceOf(ArchiveInterface::class, $result);
         $this->exec->shouldHaveReceived('command', [$expectedCommand]);
     }
 }
