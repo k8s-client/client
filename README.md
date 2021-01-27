@@ -284,7 +284,7 @@ $archive = $k8s->downloader('my-pod')
     # The file(s) or directory to download. Can be an array of files, or just a single directory or file.
     ->from('/etc')
     # If you don't specify to() it will download to a temp file.
-    ->to(__DIR__ . '/' . 'podFiles.tar')
+    ->to(__DIR__ . '/' . 'podFiles.tar.gz')
     # Initiate the download process.
     ->download();
 
