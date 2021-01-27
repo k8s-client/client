@@ -260,7 +260,7 @@ class K8s
      * @return FileUploader
      * @throws File\Exception\FileUploadException
      */
-    public function fileUploader(string $podName, ?string $source = null, ?string $destination = null) : FileUploader
+    public function uploader(string $podName, ?string $source = null, ?string $destination = null) : FileUploader
     {
         $fileUpload = new FileUploader(
             $this->factory->makeArchiveFactory(),
@@ -281,7 +281,7 @@ class K8s
      * @param string|string[] $path The path(s) to download from. Either a string path, or an array of paths.
      * @return FileDownloader
      */
-    public function fileDownloader(string $podName, $path = []): FileDownloader
+    public function downloader(string $podName, $path = []): FileDownloader
     {
         $fileDownloader = new FileDownloader(
             $this->exec($podName),

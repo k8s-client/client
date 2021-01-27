@@ -31,7 +31,7 @@ class FileUploaderTest extends TestCase
     public function testItCanUploadFilesToThePod(): void
     {
         $this->k8s()
-            ->fileUploader('test-copy')
+            ->uploader('test-copy')
             ->addFileFromString('/tmp/copy-test.txt', 'fake-data')
             ->upload();
 

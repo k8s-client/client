@@ -98,7 +98,7 @@ class FileDownloader
      * @param string $file a full file path.
      * @return $this
      */
-    public function toFile(string $file): self
+    public function to(string $file): self
     {
         $this->file = $file;
 

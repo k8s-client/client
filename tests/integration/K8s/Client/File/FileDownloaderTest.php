@@ -70,7 +70,7 @@ class FileDownloaderTest extends TestCase
     public function testItCanDownloadFilesFromThePod(): void
     {
         $result = $this->k8s()
-            ->fileDownloader('test-copy')
+            ->downloader('test-copy')
             ->from('/etc')
             ->download();
 
@@ -84,9 +84,9 @@ class FileDownloaderTest extends TestCase
     {
         $archive = __DIR__ . DIRECTORY_SEPARATOR . 'archive.tar';
         $result = $this->k8s()
-            ->fileDownloader('test-copy')
+            ->downloader('test-copy')
             ->from('/etc')
-            ->toFile($archive)
+            ->to($archive)
             ->download();
 
         $this->assertGreaterThan(0, filesize($result->getRealPath()));
@@ -99,7 +99,7 @@ class FileDownloaderTest extends TestCase
     public function testItCanDownloadCompressedFilesFromThePod(): void
     {
         $result = $this->k8s()
-            ->fileDownloader('test-copy')
+            ->downloader('test-copy')
             ->compress()
             ->from('/etc')
             ->download();

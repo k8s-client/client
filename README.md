@@ -259,7 +259,7 @@ use K8s\Client\Options;
 
 $k8s = new K8s(new Options('https://127.0.0.1:8443'));
 
-$k8s->fileUploader('my-pod')
+$k8s->uploader('my-pod')
     # Add files from paths.
     # The first argument is the source location, the second is the destination for it on the container.
     ->addFile('/path/to/local/file.txt', '/tmp/file.txt')

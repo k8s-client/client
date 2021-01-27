@@ -49,14 +49,14 @@ class K8sTest extends TestCase
 
     public function testFileUploaderReturnsFileUploaderClass(): void
     {
-        $result = $this->subject->fileUploader('foo');
+        $result = $this->subject->uploader('foo');
 
         $this->assertInstanceOf(FileUploader::class, $result);
     }
 
     public function testFileDownloaderReturnsFileDownloaderClass(): void
     {
-        $result = $this->subject->fileDownloader('foo');
+        $result = $this->subject->downloader('foo');
 
         $this->assertInstanceOf(FileDownloader::class, $result);
     }
