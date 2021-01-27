@@ -64,10 +64,10 @@ class FileDownloaderTest extends TestCase
             ->fileDownloader('test-copy')
             ->from('/etc')
             ->download();
-        $result->extractTo($this->tmpDir);
 
         $this->assertGreaterThan(0, $result->getSize());
         $this->assertGreaterThan(0, $result->count());
+        $result->extractTo($this->tmpDir);
         $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
         @unlink($result->getRealPath());
     }
@@ -80,11 +80,11 @@ class FileDownloaderTest extends TestCase
             ->from('/etc')
             ->toFile($archive)
             ->download();
-        $result->extractTo($this->tmpDir);
 
         $this->assertGreaterThan(0, $result->getSize());
         $this->assertGreaterThan(0, $result->count());
         $this->assertEquals($archive, $result->getRealPath());
+        $result->extractTo($this->tmpDir);
         $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
         @unlink($result->getRealPath());
     }
@@ -96,12 +96,12 @@ class FileDownloaderTest extends TestCase
             ->compress()
             ->from('/etc')
             ->download();
-        $result->extractTo($this->tmpDir);
 
         $this->assertGreaterThan(0, $result->getSize());
         $this->assertGreaterThan(0, $result->count());
-        $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
         $this->assertStringEndsWith('.tar.gz', $result->getRealPath());
+        $result->extractTo($this->tmpDir);
+        $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
         @unlink($result->getRealPath());
     }
 }
