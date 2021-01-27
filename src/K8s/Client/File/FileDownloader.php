@@ -65,6 +65,19 @@ class FileDownloader
     }
 
     /**
+     * Use a specific container. If not specified, defaults to the only container in the Pod.
+     *
+     * @param string $container the container name
+     * @return $this
+     */
+    public function useContainer(string $container): self
+    {
+        $this->container = $container;
+
+        return $this;
+    }
+
+    /**
      * Path(s) to be download from.
      *
      * @param string|string[] $path A single path, or array of paths.
