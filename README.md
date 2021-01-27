@@ -269,3 +269,28 @@ $k8s->uploader('my-pod')
     # This actually initiates the upload process.
     ->upload();
 ```
+
+### Download Files from a Pod
+
+```php
+use K8s\Client\K8s;
+use K8s\Client\Options;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+$archive = $k8s->downloader('my-pod')
+    # Optionally choose to compress the downloaded files (gzip -- tar.gz)
+    ->compress()
+    # The file(s) or directory to download. Can be an array of files, or just a single directory or file.
+    ->from('/etc')
+    # If you don't specify to() it will download to a temp file.
+    ->to(__DIR__ . '/' . 'podFiles.tar')
+    # Initiate the download process.
+    ->download();
+
+# The full path to the downloaded files archive..
+echo (string)$archive . PHP_EOL;
+# Extract the downloaded files to a directory called "podFiles" in the current directory..
+mkdir(__DIR__ . '/podFiles');
+$archive->extractTo(__DIR__ . '/podFiles');
+```
