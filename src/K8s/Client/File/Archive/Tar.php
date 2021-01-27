@@ -43,16 +43,51 @@ class Tar implements ArchiveInterface
         $this->tar = new PharData($file);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getRealPath(): string
+    {
+        return $this->file;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function extractTo(string $path, $files = null, bool $overwrite = false): void
+    {
+        $result = $this->tar->extractTo(
+            $path,
+            $files,
+            $overwrite
+        );
+        if ($result === false) {
+            throw new FileException(sprintf(
+                'Failed to extract archive to: %s',
+                $path
+            ));
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
     public function addFile(string $source, string $destination): void
     {
         $this->tar->addFile($source, $destination);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function addFromString(string $destination, string $data): void
     {
         $this->tar->addFromString($destination, $data);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function toStream(): StreamInterface
     {
         if (!file_exists($this->file)) {
@@ -64,6 +99,9 @@ class Tar implements ArchiveInterface
         return $this->streamFactory->createStreamFromFile($this->file);
     }
 
+    /**
+     * @inheritDoc
+     */
     public function delete(): void
     {
         if (!file_exists($this->file)) {
@@ -77,6 +115,9 @@ class Tar implements ArchiveInterface
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     public function getUploadCommand(): array
     {
         return [
@@ -86,5 +127,10 @@ class Tar implements ArchiveInterface
             '-C',
             '/',
         ];
+    }
+
+    public function __toString(): string
+    {
+        return $this->getRealPath();
     }
 }

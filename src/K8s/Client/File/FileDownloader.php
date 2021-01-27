@@ -14,11 +14,10 @@ declare(strict_types=1);
 namespace K8s\Client\File;
 
 use K8s\Client\Exception\InvalidArgumentException;
+use K8s\Client\File\Contract\ArchiveInterface;
 use K8s\Client\File\Exception\FileDownloadException;
 use K8s\Client\File\Handler\FileDownloadExecHandler;
 use K8s\Client\Kind\PodExecService;
-use Phar;
-use PharData;
 use Throwable;
 
 class FileDownloader
@@ -29,6 +28,11 @@ class FileDownloader
      * @var PodExecService
      */
     private $exec;
+
+    /**
+     * @var ArchiveFactory
+     */
+    private $archiveFactory;
 
     /**
      * @var string|null
@@ -52,9 +56,11 @@ class FileDownloader
 
     public function __construct(
         PodExecService $exec,
+        ArchiveFactory $archiveFactory,
         ?string $container = null
     ) {
         $this->exec = $exec;
+        $this->archiveFactory = $archiveFactory;
         $this->container = $container;
     }
 
@@ -116,7 +122,7 @@ class FileDownloader
      *
      * @throws FileDownloadException
      */
-    public function download(): PharData
+    public function download(): ArchiveInterface
     {
         if (empty($this->paths)) {
             throw new FileDownloadException('You must provide at least one path to download.');
@@ -136,14 +142,8 @@ class FileDownloader
                     $execHandler,
                     $this->container
                 );
-            $format = $this->compress ? Phar::GZ : Phar::TAR;
 
-            return new PharData(
-                $file->getPath(),
-                0,
-                '',
-                $format
-            );
+            return $this->archiveFactory->makeArchive($file->getPath());
         } catch (Throwable $e) {
             throw new FileDownloadException(
                 sprintf('Failed to download files: %s', $e->getMessage()),

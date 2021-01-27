@@ -283,7 +283,10 @@ class K8s
      */
     public function fileDownloader(string $podName, $path = []): FileDownloader
     {
-        $fileDownloader = new FileDownloader($this->exec($podName));
+        $fileDownloader = new FileDownloader(
+            $this->exec($podName),
+            $this->factory->makeArchiveFactory()
+        );
 
         if (!empty($path)) {
             $fileDownloader->from($path);

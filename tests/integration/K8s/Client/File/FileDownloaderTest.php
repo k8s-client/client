@@ -27,10 +27,16 @@ class FileDownloaderTest extends TestCase
      */
     private $tmpDir;
 
+    /**
+     * @var string
+     */
+    private $tmpFile;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->tmpDir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'k8s-extract';
+        $this->tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'k8s-file.tar';
         mkdir($this->tmpDir);
         $this->createAndWaitForPod(new Pod(
             'test-copy',
@@ -41,6 +47,9 @@ class FileDownloaderTest extends TestCase
     public function tearDown(): void
     {
         parent::tearDown();
+        if (file_exists($this->tmpFile)) {
+            @unlink($this->tmpFile);
+        }
         if (!file_exists($this->tmpDir)) {
             return;
         }
@@ -65,11 +74,10 @@ class FileDownloaderTest extends TestCase
             ->from('/etc')
             ->download();
 
-        $this->assertGreaterThan(0, $result->getSize());
-        $this->assertGreaterThan(0, $result->count());
+        $this->assertGreaterThan(0, filesize($result->getRealPath()));
         $result->extractTo($this->tmpDir);
+        $this->assertGreaterThan(0, count(glob($this->tmpDir . DIRECTORY_SEPARATOR . "*")));
         $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
-        @unlink($result->getRealPath());
     }
 
     public function testItCanDownloadFilesFromThePodToSpecificFile(): void
@@ -81,12 +89,11 @@ class FileDownloaderTest extends TestCase
             ->toFile($archive)
             ->download();
 
-        $this->assertGreaterThan(0, $result->getSize());
-        $this->assertGreaterThan(0, $result->count());
+        $this->assertGreaterThan(0, filesize($result->getRealPath()));
         $this->assertEquals($archive, $result->getRealPath());
         $result->extractTo($this->tmpDir);
+        $this->assertGreaterThan(0, count(glob($this->tmpDir . DIRECTORY_SEPARATOR . "*")));
         $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
-        @unlink($result->getRealPath());
     }
 
     public function testItCanDownloadCompressedFilesFromThePod(): void
@@ -97,11 +104,10 @@ class FileDownloaderTest extends TestCase
             ->from('/etc')
             ->download();
 
-        $this->assertGreaterThan(0, $result->getSize());
-        $this->assertGreaterThan(0, $result->count());
+        $this->assertGreaterThan(0, filesize($result->getRealPath()));
         $this->assertStringEndsWith('.tar.gz', $result->getRealPath());
         $result->extractTo($this->tmpDir);
+        $this->assertGreaterThan(0, count(glob($this->tmpDir . DIRECTORY_SEPARATOR . "*")));
         $this->assertTrue(file_exists($this->tmpDir . DIRECTORY_SEPARATOR . 'etc'));
-        @unlink($result->getRealPath());
     }
 }
