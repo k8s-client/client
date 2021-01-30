@@ -176,7 +176,7 @@ class FileDownloader
 
         $paths = [];
         foreach ($this->paths as $path) {
-            $paths[] = ltrim($path,'/');
+            $paths[] = ltrim($path, '/');
         }
 
         return array_merge([
@@ -186,6 +186,5 @@ class FileDownloader
             '-C',
             '/',
         ], $paths);
-
     }
 }
