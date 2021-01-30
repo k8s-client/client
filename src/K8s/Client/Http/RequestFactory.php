@@ -26,8 +26,11 @@ class RequestFactory
     private const ACTION_MAP = [
         'post' => 'POST',
         'get' => 'GET',
+        'get-status' => 'GET',
         'patch' => 'PATCH',
+        'patch-status' => 'PATCH',
         'put' => 'PUT',
+        'put-status' => 'PUT',
         'connect' => 'GET',
         'delete' => 'DELETE',
         'deletecollection' => 'DELETE',

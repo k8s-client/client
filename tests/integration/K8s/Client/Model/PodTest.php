@@ -18,6 +18,7 @@ use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\Api\Core\v1\PodList;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Patch\JsonPatch;
 
 class PodTest extends TestCase
 {
@@ -55,6 +56,40 @@ class PodTest extends TestCase
 
         $pod = $this->k8s()->replace($pod);
         $this->assertEquals(['foo' => 'bar'], $pod->getLabels());
+    }
+
+    public function testItCanReadPodStatus(): void
+    {
+        /** @var Pod $pod */
+        $pod = $this->k8s()->readStatus('test-pod', Pod::class);
+
+        $this->assertInstanceOf(Pod::class, $pod);
+        $this->assertEquals('test-pod', $pod->getName());
+    }
+
+    public function testItCanReplacePodStatus(): void
+    {
+        /** @var Pod $pod */
+        $pod = $this->k8s()->readStatus('test-pod', Pod::class);
+        $pod->getStatus()->setQosClass('Guaranteed');
+        $pod = $this->k8s()->replaceStatus($pod);
+
+        $this->assertInstanceOf(Pod::class, $pod);
+        $this->assertEquals('Guaranteed', $pod->getQosClass());
+    }
+
+    public function testItCanPatchPodStatus(): void
+    {
+        /** @var Pod $pod */
+        $pod = $this->k8s()->readStatus('test-pod', Pod::class);
+
+        $patch = new JsonPatch();
+        $patch->replace('/status/qosClass', 'BestEffort');
+
+        $pod = $this->k8s()->patchStatus($pod, $patch);
+
+        $this->assertInstanceOf(Pod::class, $pod);
+        $this->assertEquals('BestEffort', $pod->getQosClass());
     }
 
     public function testItCanListPods(): void

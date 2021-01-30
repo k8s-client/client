@@ -100,6 +100,23 @@ class K8s
     }
 
     /**
+     * Read a Kubernetes status sub-resource of a specific Kind.
+     *
+     * @param string $name the name of the Kind.
+     * @param class-string $kindFqcn The fully-qualified class name of the resource to read.
+     * @param array $query Any additional query parameters.
+     * @return object
+     */
+    public function readStatus(string $name, string $kindFqcn, $query = []): object
+    {
+        return $this->factory->makeKindManager()->readStatus(
+            $name,
+            $kindFqcn,
+            $query
+        );
+    }
+
+    /**
      * Delete all Kubernetes resource of a specific kind.
      *
      * @param class-string $kindFqcn The fully-qualified class name of the resource to delete.
@@ -200,6 +217,25 @@ class K8s
     }
 
     /**
+     * Patch a Kubernetes status sub-resource using a patch object (json, strategic, merge).
+     *
+     * @param object $kind Any Kind model object.
+     * @param PatchInterface $patch A patch class object.
+     * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
+     * @return object This would typically be the same object passed in as the Kind.
+     */
+    public function patchStatus(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
+    {
+        return $this->factory->makeKindManager()->patchStatus(
+            $kind,
+            $patch,
+            $query,
+            $namespace
+        );
+    }
+
+    /**
      * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
      *
      * @param object $kind The Kind object model.
@@ -209,6 +245,21 @@ class K8s
     public function replace(object $kind, array $query = []): object
     {
         return $this->factory->makeKindManager()->replace(
+            $kind,
+            $query
+        );
+    }
+
+    /**
+     * Replace a Kubernetes status sub-resource of the specified Kind (an atomic patch operation that requires a resourceVersion).
+     *
+     * @param object $kind The Kind object model.
+     * @param array $query Any additional query parameters.
+     * @return object The Kind model object being replaced.
+     */
+    public function replaceStatus(object $kind, array $query = []): object
+    {
+        return $this->factory->makeKindManager()->replaceStatus(
             $kind,
             $query
         );

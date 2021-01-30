@@ -95,6 +95,8 @@ class KindManager
     }
 
     /**
+     * Patch a Kubernetes resource using a patch object (json, strategic, merge).
+     *
      * @param object $kind Any Kind model object.
      * @param PatchInterface $patch A patch class object.
      * @param array $query Any additional query parameters.
@@ -116,6 +118,29 @@ class KindManager
     }
 
     /**
+     * Patch a Kubernetes status sub-resource using a patch object (json, strategic, merge).
+     *
+     * @param object $kind Any Kind model object.
+     * @param PatchInterface $patch A patch class object.
+     * @param array $query Any additional query parameters.
+     * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
+     * @return object This would typically be the same object passed in as the Kind.
+     */
+    public function patchStatus(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
+    {
+        $options['query'] = $query;
+        $options['namespace'] = $namespace;
+        $options['body'] = $patch;
+
+        return $this->execute(
+            'patch-status',
+            $options,
+            $kind,
+            ['{name}' => $this->getObjectName($kind)]
+        );
+    }
+
+    /**
      * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
      *
      * @param object $kind The Kind object model.
@@ -128,6 +153,25 @@ class KindManager
 
         return $this->execute(
             'put',
+            $options,
+            $kind,
+            ['{name}' => $this->getObjectName($kind)]
+        );
+    }
+
+    /**
+     * Replace a Kubernetes status sub-resource (an atomic patch operation that requires a resourceVersion).
+     *
+     * @param object $kind The Kind object model.
+     * @param array $query Any additional query parameters.
+     * @return object The Kind model object being replaced.
+     */
+    public function replaceStatus(object $kind, array $query = []): object
+    {
+        $options['query'] = $query;
+
+        return $this->execute(
+            'put-status',
             $options,
             $kind,
             ['{name}' => $this->getObjectName($kind)]
@@ -186,6 +230,26 @@ class KindManager
 
         return $this->execute(
             'get',
+            $options,
+            $kindFqcn,
+            ['{name}' => $name]
+        );
+    }
+
+    /**
+     * Read a Kubernetes status sub-resource of a specific Kind.
+     *
+     * @param string $name the name of the Kind.
+     * @param class-string $kindFqcn The fully-qualified class name of the resource to read.
+     * @param array $query Any additional query parameters.
+     * @return object
+     */
+    public function readStatus(string $name, string $kindFqcn, $query = []): object
+    {
+        $options['query'] = $query;
+
+        return $this->execute(
+            'get-status',
             $options,
             $kindFqcn,
             ['{name}' => $name]
