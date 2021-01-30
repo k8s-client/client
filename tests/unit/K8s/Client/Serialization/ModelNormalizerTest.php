@@ -55,12 +55,12 @@ class ModelNormalizerTest extends TestCase
             [
                 'apiVersion' => 'v1',
                 'kind' => 'Pod',
-                'metadata' => [
+                'metadata' => (object)[
                     'name' => 'foo',
                 ],
-                'spec' => [
+                'spec' => (object)[
                     'containers' => [
-                        [
+                        (object)[
                             'image' => 'nginx:latest',
                             'name' => 'web',
                         ],
