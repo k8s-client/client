@@ -17,6 +17,7 @@ use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\Api\Core\v1\PodList;
+use K8s\Api\Model\Api\Policy\v1beta1\Eviction;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use K8s\Client\Patch\JsonPatch;
 
@@ -154,6 +155,17 @@ class PodTest extends TestCase
         foreach ($results as $result) {
             $this->assertInstanceOf(Pod::class, $result->getObject());
         }
+    }
+
+    public function testItCanEvictThePod(): void
+    {
+        $this->createAndWaitForPod(new Pod(
+            'eviction-test',
+            [new Container('eviction-test', 'nginx:latest')]
+        ));
+
+        $result = $this->k8s()->create(new Eviction('eviction-test'));
+        $this->assertInstanceOf(Eviction::class, $result);
     }
 
     public function testItCanDeletePods(): void
