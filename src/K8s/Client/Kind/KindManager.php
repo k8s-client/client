@@ -349,6 +349,9 @@ class KindManager
         $metadata = $this->metadataCache->get(is_object($object) ? get_class($object) : $object);
         $operation = $metadata->getOperationByType($action);
 
+        if ($this->operationNeedsName($operation->getPath(), $params, $object)) {
+            $params['{name}'] = $this->getObjectName($object);
+        }
         if ($operation->isBodyRequired()) {
             $options['body'] = $options['body'] ?? $object;
         }
@@ -420,5 +423,17 @@ class KindManager
         }
 
         return $name;
+    }
+
+    /**
+     * @param array<string, string> $params
+     * @param class-string|object $object
+     * @return bool
+     */
+    private function operationNeedsName(string $path, array $params, $object): bool
+    {
+        return is_object($object)
+            && strpos($path, '{name}') !== false
+            && !in_array('{name}', $params, true);
     }
 }
