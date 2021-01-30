@@ -46,6 +46,17 @@ class PodTest extends TestCase
         $this->assertEquals('test-pod', $pod->getName());
     }
 
+    public function testItCanReplacePodData(): void
+    {
+        /** @var Pod $pod */
+        $pod = $this->k8s()->read('test-pod', Pod::class);
+        $pod->getContainers()[0]->setImage('nginx:1.18');
+        $pod->setLabels(['foo' => 'bar']);
+
+        $pod = $this->k8s()->replace($pod);
+        $this->assertEquals(['foo' => 'bar'], $pod->getLabels());
+    }
+
     public function testItCanListPods(): void
     {
         /** @var PodList $podList */
