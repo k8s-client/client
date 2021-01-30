@@ -68,19 +68,19 @@ class ModelNormalizer implements NormalizerInterface
     private function normalizeValue(ModelPropertyMetadata $property, $value)
     {
         if ($property->isModel()) {
-            return $this->normalize(
+            return (object)$this->normalize(
                 $value,
                 $property->getModelFqcn()
             );
         } elseif ($property->isCollection() && !empty($value)) {
             return array_map(function (object $item) use ($property) {
-                return $this->normalize(
+                return (object)$this->normalize(
                     $item,
                     $property->getModelFqcn()
                 );
             }, iterator_to_array($value));
         } elseif ($property->isDateTime() && $value instanceof DateTimeInterface) {
-            return $value->format(DATE_ISO8601);
+            return $value->format(DATE_RFC3339);
         }
 
         return $value;
