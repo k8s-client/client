@@ -181,6 +181,8 @@ class K8s
     }
 
     /**
+     * Patch a Kubernetes resource using a patch object (json, strategic, merge).
+     *
      * @param object $kind Any Kind model object.
      * @param PatchInterface $patch A patch class object.
      * @param array $query Any additional query parameters.
@@ -194,6 +196,21 @@ class K8s
             $patch,
             $query,
             $namespace
+        );
+    }
+
+    /**
+     * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
+     *
+     * @param object $kind The Kind object model.
+     * @param array $query Any additional query parameters.
+     * @return object The Kind model object being replaced.
+     */
+    public function replace(object $kind, array $query = []): object
+    {
+        return $this->factory->makeKindManager()->replace(
+            $kind,
+            $query
         );
     }
 

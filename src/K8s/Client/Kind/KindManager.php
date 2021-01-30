@@ -116,6 +116,25 @@ class KindManager
     }
 
     /**
+     * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
+     *
+     * @param object $kind The Kind object model.
+     * @param array $query Any additional query parameters.
+     * @return object The Kind model object being replaced.
+     */
+    public function replace(object $kind, array $query = []): object
+    {
+        $options['query'] = $query;
+
+        return $this->execute(
+            'put',
+            $options,
+            $kind,
+            ['{name}' => $this->getObjectName($kind)]
+        );
+    }
+
+    /**
      * Delete all Kubernetes resource of a specific kind in a namespace.
      *
      * @param class-string $kindFqcn The fully-qualified class name of the resource to delete.

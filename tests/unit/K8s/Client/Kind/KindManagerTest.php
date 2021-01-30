@@ -276,4 +276,28 @@ class KindManagerTest extends TestCase
 
         $this->subject->watchNamespaced(function(){}, Pod::class);
     }
+
+    public function testReplace(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('put')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => true,
+        ]);
+
+        $pod = new Pod('foo', []);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($pod);
+
+        $result = $this->subject->replace($pod);
+        $this->assertEquals($pod, $result);
+    }
 }
