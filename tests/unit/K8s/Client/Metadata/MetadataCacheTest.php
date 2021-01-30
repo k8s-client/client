@@ -42,7 +42,10 @@ class MetadataCacheTest extends TestCase
         parent::setUp();
         $this->parser = \Mockery::spy(MetadataParser::class);
         $this->cache = \Mockery::spy(CacheInterface::class);
-        $this->subject = new MetadataCache($this->parser, $this->cache);
+        $this->subject = new MetadataCache(
+            $this->parser,
+            $this->cache
+        );
     }
 
     public function testGetFromCacheWhenItIsntCached(): void

@@ -17,6 +17,9 @@ use K8s\Client\Exception\RuntimeException;
 use K8s\Core\Annotation\Kind;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Psr\SimpleCache\CacheInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use ReflectionClass;
 
 class MetadataCache
 {
@@ -25,15 +28,19 @@ class MetadataCache
         __DIR__ . '/../../../../vendor/k8s/api/src/K8s/Api/Model',
     ];
 
+    private const PREFIX_KIND_MAP = 'kind-map';
+
+    private const PREFIX_KIND_META = 'kind-meta';
+
     /**
      * @var array<class-string, ModelMetadata>
      */
     private $modelMetadata = [];
 
     /**
-     * @var array<string, class-string[]>
+     * @var array<string, class-string[]>|null
      */
-    private $kindMap = [];
+    private $kindMap = null;
 
     /**
      * @var CacheInterface|null
@@ -73,11 +80,22 @@ class MetadataCache
      */
     public function getModelFqcnFromKind(string $apiVersion, string $kind): ?string
     {
-        if (empty($this->kindMap)) {
-            $this->populateKindMap();
+        if ($this->kindMap === null) {
+            $this->kindMap = $this->cache ? $this->getOrCacheKindMap() : $this->generateKindMap();
         }
 
         return $this->kindMap[$apiVersion][$kind] ?? null;
+    }
+
+    private function getOrCacheKindMap(): array
+    {
+        $kindMap = $this->cache->get(self::PREFIX_KIND_MAP);
+        if (!$kindMap) {
+            $kindMap = $this->generateKindMap();
+            $this->cache->set(self::PREFIX_KIND_MAP, $kindMap);
+        }
+
+        return $kindMap;
     }
 
     /**
@@ -85,11 +103,11 @@ class MetadataCache
      */
     private function getOrCacheMetadata(string $modelFqcn): ModelMetadata
     {
-        $metadata = $this->cache->get($modelFqcn);
+        $metadata = $this->cache->get(self::PREFIX_KIND_META . $modelFqcn);
         if (!$metadata) {
             $metadata = $this->parser->parse($modelFqcn);
             $this->cache->set(
-                $modelFqcn,
+                self::PREFIX_KIND_META . $modelFqcn,
                 $metadata
             );
         }
@@ -110,8 +128,9 @@ class MetadataCache
         return $this->modelMetadata[$modelFqcn];
     }
 
-    private function populateKindMap(): void
+    private function generateKindMap(): array
     {
+        $kindMap = [];
         $path = null;
 
         foreach (self::MODEL_PATHS as $modelPath) {
@@ -123,11 +142,14 @@ class MetadataCache
         }
 
         if ($path === null) {
-            throw new RuntimeException('Unable to locate the path to the Kubernetes API model classes.');
+            throw new RuntimeException(sprintf(
+                'Unable to locate the path to the Kubernetes API model classes. Paths tried: %s',
+                implode(', ', self::MODEL_PATHS)
+            ));
         }
 
-        $directory = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path)
+        $directory = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($path)
         );
 
         $reader = new AnnotationReader();
@@ -152,7 +174,7 @@ class MetadataCache
                 $fqcn .= $matches[1];
             }
 
-            $class = new \ReflectionClass($fqcn);
+            $class = new ReflectionClass($fqcn);
             $classKind = $reader->getClassAnnotation($class, Kind::class);
             if (!$classKind) {
                 continue;
@@ -169,7 +191,9 @@ class MetadataCache
                 $this->kindMap[$apiVersion] = [];
             }
 
-            $this->kindMap[$apiVersion][$classKind->kind] = $fqcn;
+            $kindMap[$apiVersion][$classKind->kind] = $fqcn;
         }
+
+        return $kindMap;
     }
 }
