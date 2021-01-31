@@ -16,6 +16,7 @@ namespace integration\K8s\Client\Kind;
 use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
+use K8s\Client\Websocket\ExecConnection;
 
 class PodAttachServiceTest extends TestCase
 {
@@ -43,16 +44,15 @@ class PodAttachServiceTest extends TestCase
         $this->k8s()
             ->attach('attach-test')
             ->useStdout()
-            ->run(function (string $channel, string $data) use (&$results) {
-                if (!empty(trim($data))) {
-                    $results[$channel] = $data;
+            ->run(function (string $channel, string $data, ExecConnection $connection) use (&$results) {
+                if ($channel === ExecConnection::CHANNEL_STDOUT && !empty(trim($data))) {
+                    $results[] = $data;
                 }
                 if (count($results) >= 3) {
-                    return false;
+                    $connection->close();
                 }
             });
 
-        $this->assertArrayHasKey('stdout', $results);
         $this->assertEquals('hihihi', implode('', $results));
     }
 }
