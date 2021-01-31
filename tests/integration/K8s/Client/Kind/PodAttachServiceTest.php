@@ -53,6 +53,6 @@ class PodAttachServiceTest extends TestCase
                 }
             });
 
-        $this->assertEquals('hihihi', implode('', $results));
+        $this->assertEquals("hi\nhi\nhi\n", implode('', $results));
     }
 }
