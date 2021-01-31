@@ -16,6 +16,7 @@ namespace K8s\Client;
 use K8s\Api\Service\ServiceFactory;
 use K8s\Client\File\FileDownloader;
 use K8s\Client\File\FileUploader;
+use K8s\Client\Kind\PodAttachService;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
 use K8s\Core\PatchInterface;
@@ -295,6 +296,29 @@ class K8s
             $podName,
             $namespace ?? $this->options->getNamespace()
         );
+    }
+
+    /**
+     * Attach to the main running process of a container in a Pod.
+     *
+     * @param string $podName The Pod name to attach to.
+     * @param string|null $container The specific container to attach to. If not specified, defaults to the first container.
+     * @param string|null $namespace The specific namespace the pod is in. Defaults to the one specified in options.
+     * @return PodAttachService
+     */
+    public function attach(string $podName, ?string $container = null, ?string $namespace = null): PodAttachService
+    {
+        $attach = new PodAttachService(
+            $this->api()->v1CorePodAttachOptions(),
+            $podName,
+            $namespace ?? $this->options->getNamespace()
+        );
+
+        if (!empty($container)) {
+            $attach->useContainer($container);
+        }
+
+        return $attach;
     }
 
     /**

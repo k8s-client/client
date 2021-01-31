@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace K8s\Client\Kind;
 
-use K8s\Api\Service\Core\v1\PodExecOptionsService;
+use K8s\Api\Service\Core\v1\PodAttachOptionsService;
 use K8s\Client\Exception\InvalidArgumentException;
 use K8s\Client\Websocket\Contract\ContainerExecInterface;
 
-class PodExecService
+class PodAttachService
 {
     use PodExecTrait;
 
     /**
-     * @var PodExecOptionsService
+     * @var PodAttachOptionsService
      */
     private $service;
 
@@ -31,7 +31,7 @@ class PodExecService
      */
     private $name;
 
-    public function __construct(PodExecOptionsService $service, string $name, string $namespace)
+    public function __construct(PodAttachOptionsService $service, string $name, string $namespace)
     {
         $this->service = $service;
         $this->name = $name;
@@ -39,19 +39,7 @@ class PodExecService
     }
 
     /**
-     * Command is the remote command to execute. argv array. Not executed within a shell.
-     *
-     * @param string|string[] $command
-     */
-    public function command($command): self
-    {
-        $this->options['command'] = $command;
-
-        return $this;
-    }
-
-    /**
-     * Executes the command with the given handler in the Pod.
+     * Attaches to the  the containers main process with the given handler.
      *
      * @param callable|ContainerExecInterface $handler
      */
@@ -64,7 +52,7 @@ class PodExecService
             ));
         }
 
-        $this->service->connectGetNamespacedPodExec(
+        $this->service->connectGetNamespacedPodAttach(
             $this->name,
             $handler,
             $this->options

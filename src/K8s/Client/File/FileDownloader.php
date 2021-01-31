@@ -144,6 +144,10 @@ class FileDownloader
         $suffix = $this->compress ? '.gz' : '';
         $file = new FileResource($this->file ?? $this->getTempFilename($suffix));
 
+        if ($this->container) {
+            $this->exec->useContainer($this->container);
+        }
+
         try {
             $execHandler = new FileDownloadExecHandler($file);
             $this->exec->useStdin()
@@ -151,10 +155,7 @@ class FileDownloader
                 ->useStderr()
                 ->useTty(false)
                 ->command($this->getDownloadCommand())
-                ->run(
-                    $execHandler,
-                    $this->container
-                );
+                ->run($execHandler);
 
             return $this->archiveFactory->makeArchive($file->getPath());
         } catch (Throwable $e) {

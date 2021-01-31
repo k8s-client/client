@@ -111,6 +111,10 @@ class FileUploader
         }
         $archive = $archive ?? $this->archive;
 
+        if ($this->container) {
+            $this->exec->useContainer($this->container);
+        }
+
         try {
             # This solution requires tar, but this is also how kubectl works.
             $execHandler = new FileUploadExecHandler($archive->toStream());
@@ -119,10 +123,7 @@ class FileUploader
                 ->useStderr()
                 ->useTty(false)
                 ->command($archive->getUploadCommand())
-                ->run(
-                    $execHandler,
-                    $this->container
-                );
+                ->run($execHandler);
         } catch (Throwable $e) {
             throw new FileUploadException(
                 sprintf('Failed to upload file: %s', $e->getMessage()),

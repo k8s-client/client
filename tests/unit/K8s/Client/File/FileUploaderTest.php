@@ -94,7 +94,7 @@ class FileUploaderTest extends TestCase
 
         $this->subject->addFileFromString('/foo.txt', 'data');
         $this->subject->upload();
-        $this->execService->shouldHaveReceived('run', [\Mockery::type(FileUploadExecHandler::class), null]);
+        $this->execService->shouldHaveReceived('run', [\Mockery::type(FileUploadExecHandler::class)]);
     }
 
     public function testItRunsTheCommandToUploadInSpecificContainer(): void
@@ -113,11 +113,14 @@ class FileUploaderTest extends TestCase
             ->andReturn($this->execService);
         $this->execService->shouldReceive('useStderr')
             ->andReturn($this->execService);
+        $this->execService->shouldReceive('useContainer')
+            ->with('foo')
+            ->andReturn($this->execService);
 
         $this->subject->useContainer('foo');
         $this->subject->addFileFromString('/foo.txt', 'data');
         $this->subject->upload();
-        $this->execService->shouldHaveReceived('run', [\Mockery::type(FileUploadExecHandler::class), 'foo']);
+        $this->execService->shouldHaveReceived('run', [\Mockery::type(FileUploadExecHandler::class)]);
     }
 
     public function testItThrowsAnExceptionIfNoFilesWereAddedToUpload()

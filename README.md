@@ -223,6 +223,29 @@ $k8s->exec('web', '/usr/bin/whoami')
     });
 ```
 
+### Attach to the running process of a container in a Pod
+
+```php
+use K8s\Client\K8s;
+use K8s\Client\Options;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+# Attaches to the main running process of the container in the Pod
+$k8s->attach('my-pod')
+    # You must specify at least one of useStdout(), useStderr(), useStdin()
+    ->useStdout()
+    # Prints out any STDOUT from the main running process
+    # Can also pass it an instance of ContainerExecInterface
+    ->run(function (string $channel, string $data) {
+        echo sprintf(
+            "%s => %s",
+            $channel,
+            $data
+        ) . PHP_EOL;
+    });
+```
+
 ### Patch a Deployment
 
 ```php
