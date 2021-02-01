@@ -1,3 +1,13 @@
+1.3.0 (2021-01-31)
+--
+* Add the ability to perform a replace / put operation.
+* Add the ability to attach the running process of a container in a Pod.
+* Add the ability to read the status sub-resource.
+* Add the ability to patch the status sub-resource.
+* Add the ability to replace the status sub-resource.
+* Minor change to allow the POST of an Eviction to work.
+* Fix how empty objects and time values are serialized when sent to Kubernetes.
+
 1.2.0 (2021-01-27)
 --
 * Add the ability to download files from Pods.
