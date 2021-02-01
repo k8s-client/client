@@ -61,4 +61,12 @@ class GenericHandler implements FrameHandlerInterface
     public function onClose(): void
     {
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function subprotocol(): string
+    {
+        return 'channel.k8s.io';
+    }
 }

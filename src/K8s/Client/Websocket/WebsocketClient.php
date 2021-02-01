@@ -58,6 +58,9 @@ class WebsocketClient
                 $frameHandler = new GenericHandler($handler);
         }
 
-        $this->adapter->connect(self::SUB_PROTOCOL, $request, $frameHandler);
+        $this->adapter->connect(
+            $request,
+            $frameHandler
+        );
     }
 }

@@ -61,7 +61,6 @@ class WebsocketClientTest extends TestCase
         $this->adapter->shouldHaveReceived(
             'connect',
             [
-                'channel.k8s.io',
                 \Mockery::type(RequestInterface::class),
                 \Mockery::type(ExecHandler::class)
             ]
@@ -79,7 +78,6 @@ class WebsocketClientTest extends TestCase
         $this->adapter->shouldHaveReceived(
             'connect',
             [
-                'channel.k8s.io',
                 \Mockery::type(RequestInterface::class),
                 \Mockery::type(GenericHandler::class)
             ]

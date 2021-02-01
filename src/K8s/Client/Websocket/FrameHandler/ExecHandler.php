@@ -102,4 +102,12 @@ class ExecHandler implements FrameHandlerInterface
             $this->receiver->onClose();
         }
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function subprotocol(): string
+    {
+        return 'channel.k8s.io';
+    }
 }
