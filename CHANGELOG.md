@@ -1,3 +1,7 @@
+1.3.1 (2021-02-13)
+--
+* Be more restrictive with the minor version of k8s/core.
+
 1.3.0 (2021-01-31)
 --
 * Add the ability to perform a replace / put operation.
