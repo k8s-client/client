@@ -18,7 +18,7 @@
     "ext-json": "*",
     "doctrine/annotations": "^1.0",
     "k8s/api": "*",
-    "k8s/core": "^1.2",
+    "k8s/core": "~1.2.0",
     "klkvsk/json-decode-stream": "^1.0",
     "php-http/discovery": "^1.0",
     "psr/http-client": "^1.0",
