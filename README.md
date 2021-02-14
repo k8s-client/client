@@ -51,6 +51,8 @@ $options->setToken('some-secret-token-value-goes-here');
 $k8s = new K8s($options);
 ```
 
+**Note** If you need to perform certificate based authentication, check the options for the HttpClient you are using.
+
 ### List all Pods
 
 ```php
@@ -316,4 +318,92 @@ echo (string)$archive . PHP_EOL;
 # Extract the downloaded files to a directory called "podFiles" in the current directory..
 mkdir(__DIR__ . '/podFiles');
 $archive->extractTo(__DIR__ . '/podFiles');
+```
+
+### Port Forwarding to a Pod
+
+**Note**: The below example assumes a pod called "portforward-example" exists with port 80 serving HTTP (such as a base nginx image).
+
+Create a class that reacts to port forwarding events:
+
+```php
+namespace App;
+
+use K8s\Client\Websocket\Contract\PortChannelInterface;
+use K8s\Client\Websocket\Contract\PortForwardInterface;
+use K8s\Client\Websocket\PortChannels;
+
+class PortForwarder implements PortForwardInterface
+{
+    /**
+    * @var PortChannels
+    */
+    private $portChannels;
+
+    /**
+    * @inheritDoc
+    */
+    public function onInitialize(PortChannels $portChannels) : void
+    {
+        $this->portChannels = $portChannels;
+
+        # On initialize, send this HTTP request across.
+        # Due to "Connection: close" HTTP instruction, the websocket will close after the response is received.
+        # In a more realistic situation, you'd probably want to keep this open, and react in the onDataReceived method.
+        $data = "GET / HTTP/1.1\r\n";
+        $data .= "Host: 127.0.0.1\r\n";
+        $data .= "Connection: close\r\n";
+        $data .= "Accept: */*\r\n";
+        $data .= "\r\n";
+
+        $this->portChannels->writeToPort(80, $data);
+    }
+
+    /**
+    * @inheritDoc
+    */
+    public function onDataReceived(string $data, PortChannelInterface $portChannel) : void
+    {
+        echo sprintf(
+            'Received data on port %s:',
+            $portChannel->getPortNumber()
+        ) . PHP_EOL;
+        echo $data . PHP_EOL;
+    }
+
+    /**
+    * @inheritDoc
+    */
+    public function onErrorReceived(string $data, PortChannelInterface $portChannel) : void
+    {
+        echo sprintf(
+            'Received error on port %s: %s',
+            $portChannel->getPortNumber(),
+            $data
+        ) . PHP_EOL;
+    }
+    
+    /**
+    * @inheritDoc
+    */
+    public function onClose() : void
+    {
+        # Do something here to clean-up resources when the connection is closed...
+    }
+}
+```
+
+Use the above class as a handler for the port forward process:
+
+```php
+use K8s\Client\K8s;
+use K8s\Client\Options;
+use App\PortForwarder;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+$handler = new PortForwarder();
+# Assuming a Pod with a basic HTTP port 80 exposed...
+$k8s->portforward('portforward-example', 80)
+    ->start($handler);
 ```
