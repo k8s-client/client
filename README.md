@@ -7,6 +7,8 @@ k8s-client is a Kubernetes API client for PHP.
 * Supports all Kinds from the Kubernetes API (via auto-generated Kind models with annotations and type-hints).
 * Pluggable websocket adapter support (For executing commands in pods, attaching, port-forwarding, etc)
 
+The Kind models are auto-generated nightly for the last 10 versions of the Kubernetes API.
+
 * [Installation](#installation)
     * [Using a Specific Kubernetes Version](#using-a-specific-kubernetes-api-version)
     * [Installing a Websocket Adapter](#installing-a-websocket-adapter)
