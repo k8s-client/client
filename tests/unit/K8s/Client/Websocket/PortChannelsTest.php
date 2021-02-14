@@ -76,6 +76,13 @@ class PortChannelsTest extends TestCase
         $this->assertEquals($this->channel1, $result);
     }
 
+    public function testWriteToPort(): void
+    {
+        $this->subject->writeToPort(80, 'foo');
+
+        $this->channel1->shouldHaveReceived('write', ['foo']);
+    }
+
     public function testItThrowsExceptionWhenNoChannelExists(): void
     {
         $this->expectException(RuntimeException::class);

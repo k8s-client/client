@@ -31,6 +31,9 @@ class PortChannels implements IteratorAggregate
         $this->portChannels = $portChannels;
     }
 
+    /**
+     * Get a port channel by its port number.
+     */
     public function getByPort(int $port, string $type = PortChannelInterface::TYPE_DATA): PortChannelInterface
     {
         foreach ($this->portChannels as $portChannel) {
@@ -46,6 +49,9 @@ class PortChannels implements IteratorAggregate
         ));
     }
 
+    /**
+     * Get a part channel by the channel number.
+     */
     public function getByChannel(int $channel): PortChannelInterface
     {
         foreach ($this->portChannels as $portChannel) {
@@ -58,6 +64,18 @@ class PortChannels implements IteratorAggregate
             'Channel %s is not an initialized channel.',
             $channel
         ));
+    }
+
+    /**
+     * Write data to the port channel with the given port number.
+     *
+     * @param int $port
+     * @param string $data
+     */
+    public function writeToPort(int $port, string $data): void
+    {
+        $portChannel = $this->getByPort($port);
+        $portChannel->write($data);
     }
 
     /**
