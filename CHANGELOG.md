@@ -1,3 +1,7 @@
+1.4.0 (2021-02-14)
+--
+* Add the ability to port-forward from a pod.
+
 1.3.1 (2021-02-13)
 --
 * Be more restrictive with the minor version of k8s/core.
