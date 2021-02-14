@@ -16,6 +16,7 @@ namespace unit\K8s\Client\Websocket;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Websocket\FrameHandler\ExecHandler;
 use K8s\Client\Websocket\FrameHandler\GenericHandler;
+use K8s\Client\Websocket\FrameHandler\PortForwardHandler;
 use K8s\Client\Websocket\WebsocketClient;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Nyholm\Psr7\Request;
@@ -63,6 +64,23 @@ class WebsocketClientTest extends TestCase
             [
                 \Mockery::type(RequestInterface::class),
                 \Mockery::type(ExecHandler::class)
+            ]
+        );
+    }
+
+    public function testItUsesThePortForwardHandlerOnConnectForPortForward(): void
+    {
+        $request = new Request('GET', '/foo?ports=80&ports=443');
+        $this->requestFactory->shouldReceive('makeRequest')
+            ->andReturn($request);
+        $callable = function () {};
+
+        $this->subject->connect('/foo', 'portforward', $callable);
+        $this->adapter->shouldHaveReceived(
+            'connect',
+            [
+                \Mockery::type(RequestInterface::class),
+                \Mockery::type(PortForwardHandler::class)
             ]
         );
     }

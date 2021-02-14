@@ -19,6 +19,7 @@ use K8s\Client\K8s;
 use K8s\Client\Kind\PodAttachService;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
+use K8s\Client\Kind\PortForwardService;
 use K8s\Client\Options;
 
 class K8sTest extends TestCase
@@ -67,5 +68,19 @@ class K8sTest extends TestCase
         $result = $this->subject->downloader('foo');
 
         $this->assertInstanceOf(FileDownloader::class, $result);
+    }
+
+    public function testPortForwardReturnsPortForwardClass(): void
+    {
+        $result = $this->subject->portforward('foo', 80);
+
+        $this->assertInstanceOf(PortForwardService::class, $result);
+    }
+
+    public function testPortForwardReturnsPortForwardClassWithMultiplePorts(): void
+    {
+        $result = $this->subject->portforward('foo', [80, 443]);
+
+        $this->assertInstanceOf(PortForwardService::class, $result);
     }
 }

@@ -14,14 +14,15 @@ declare(strict_types=1);
 namespace K8s\Client\Websocket;
 
 use K8s\Client\Http\RequestFactory;
+use K8s\Client\Websocket\Contract\PortForwardInterface;
+use K8s\Client\Websocket\FrameHandler\PortForwardHandler;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use K8s\Client\Websocket\FrameHandler\ExecHandler;
 use K8s\Client\Websocket\FrameHandler\GenericHandler;
+use Psr\Http\Message\RequestInterface;
 
 class WebsocketClient
 {
-    private const SUB_PROTOCOL = 'channel.k8s.io';
-
     /**
      * @var WebsocketClientInterface
      */
@@ -54,6 +55,12 @@ class WebsocketClient
             case 'exec':
                 $frameHandler = new ExecHandler($handler);
                 break;
+            case 'portforward':
+                $frameHandler = $this->makePortForwardHandler(
+                    $request,
+                    $handler
+                );
+                break;
             default:
                 $frameHandler = new GenericHandler($handler);
         }
@@ -62,5 +69,37 @@ class WebsocketClient
             $request,
             $frameHandler
         );
+    }
+
+    /**
+     * @param callable|PortForwardInterface $handler
+     */
+    private function makePortForwardHandler(RequestInterface $request, $handler): PortForwardHandler
+    {
+        $query = $request->getUri()->getQuery();
+        $ports = $this->parsePortsFromQueryString($query);
+
+        return new PortForwardHandler(
+            $handler,
+            $ports
+        );
+    }
+
+    private function parsePortsFromQueryString(string $query): array
+    {
+        $ports = [];
+
+        $pairs = explode('&', $query);
+        foreach ($pairs as $pair) {
+            list($name, $value) = explode('=', $pair, 2);
+            if ($name !== 'ports') {
+                continue;
+            }
+            if(!isset($ports[$value])) {
+                $ports[] = (int)$value;
+            }
+        }
+
+        return $ports;
     }
 }

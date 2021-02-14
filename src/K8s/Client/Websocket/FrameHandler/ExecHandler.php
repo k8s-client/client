@@ -49,6 +49,9 @@ class ExecHandler implements FrameHandlerInterface
         $this->receiver = $receiver;
     }
 
+    /**
+     * @inheritDoc
+     */
     public function onReceive(Frame $frame, WebsocketConnectionInterface $connection): void
     {
         $data = $frame->getPayload();

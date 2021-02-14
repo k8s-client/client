@@ -19,6 +19,7 @@ use K8s\Client\File\FileUploader;
 use K8s\Client\Kind\PodAttachService;
 use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
+use K8s\Client\Kind\PortForwardService;
 use K8s\Core\PatchInterface;
 
 class K8s
@@ -385,5 +386,21 @@ class K8s
         }
 
         return $fileDownloader;
+    }
+
+    /**
+     * Forward port(s) from a pod to communicate with the port(s) locally.
+     *
+     * @param string $podName The pod name to port-forward from.
+     * @param int|array $port The port, or array of ports, to forward.
+     * @return PortForwardService
+     */
+    public function portforward(string $podName, $port): PortForwardService
+    {
+        return new PortForwardService(
+            $podName,
+            array_map('intval', (array)$port),
+            $this->api()->v1CorePodPortForwardOptions()
+        );
     }
 }
