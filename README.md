@@ -1,8 +1,29 @@
 # k8s-client ![](https://github.com/ChadSikorra/k8s-client/workflows/Build/badge.svg) [![codecov](https://codecov.io/gh/ChadSikorra/k8s-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ChadSikorra/k8s-client)
 
-k8s-client is a Kubernetes API client for PHP. The Kubernetes resource models and services used by this library are auto-generated
-from the OpenAPI spec of the Kubernetes API. This library provides an easy way of using those models / services from different
-API versions.
+k8s-client is a Kubernetes API client for PHP.
+
+* HTTP Client agnostic (supports any [PSR-18 compatible HTTP Client](https://packagist.org/providers/psr/http-client-implementation))
+* Supports all major API operations (read, watch, list, patch, delete, exec, attach, logs, port-forward, etc)
+* Supports all Kinds from the Kubernetes API (via auto-generated Kind models with annotations and type-hints).
+* Pluggable websocket adapter support (For executing commands in pods, attaching, port-forwarding, etc)
+
+* [Installation](#installation)
+    * [Using a Specific Kubernetes Version](#using-a-specific-kubernetes-api-version)
+    * [Installing a Websocket Adapter](#installing-a-websocket-adapter)
+    * [Constructing the Client](#constructing-the-client)
+* [Examples](#examples)
+    * [List All Pods](#list-all-pods)
+    * [Watch All Deployments in a Namespace](#watch-all-deployments-in-a-namespace)
+    * [Create a Pod](#create-a-pod)
+    * [Create a Deployment](#create-a-deployment)
+    * [Patch a Deployment](#patch-a-deployment)
+    * [Get Logs for a Pod](#get-logs-for-a-pod)
+    * [Follow Logs for a Pod](#follow-logs-for-a-pod)
+    * [Execute a Command in a Pod](#execute-a-command-in-a-pod-container)
+    * [Attach to the Running Process of a Pod](#attach-to-the-running-process-of-a-container-in-a-pod)
+    * [Download Files form a Pod](#download-files-from-a-pod)
+    * [Upload Files to a Pod](#upload-files-to-a-pod)
+    * [Port Forwarding from a Pod](#port-forwarding-from-a-pod)
 
 ## Installation
 
@@ -13,7 +34,7 @@ Install using composer:
 This library requires a [PSR-18 compatible HTTP Client](https://packagist.org/providers/psr/http-client-implementation), such as Guzzle or Symfony's HttpClient.
 It can also be given a [PSR-16 compatible Simple Cache implementation](https://packagist.org/providers/psr/simple-cache-implementation) to help speed up the library.
 
-## Using a Specific Kubernetes API version
+### Using a Specific Kubernetes API version
 
 Each Kubernetes version may have different resources and operations. If you require a specific version, then you can
 require the version of the `k8s/api` library that you need to use. That library contains all the API specific versions
@@ -26,7 +47,7 @@ For instance, to use API version 1.18:
 **Note**: The version of `k8s/api` does not exactly reflect the version of the Kubernetes API. The patch version of 
 Kubernetes may not be the same as the `k8s/api` patch version.
 
-## Installing a Websocket Adapter
+### Installing a Websocket Adapter
 
 Certain Kuberenetes API endpoints (such as exec, to run commands in a container) require websockets to communicate. If you
 need support for this, install this adapter:
@@ -35,7 +56,7 @@ need support for this, install this adapter:
 
 See that library's readme for more information: https://github.com/ChadSikorra/k8s-ws-ratchet
 
-## Using the Client
+### Constructing the Client
 
 Construct the client with your needed options:
 
@@ -52,6 +73,8 @@ $k8s = new K8s($options);
 ```
 
 **Note**: If you need to perform certificate based authentication, check the options for the HttpClient you are using.
+
+##Examples
 
 ### List all Pods
 
@@ -320,7 +343,7 @@ mkdir(__DIR__ . '/podFiles');
 $archive->extractTo(__DIR__ . '/podFiles');
 ```
 
-### Port Forwarding to a Pod
+### Port Forwarding from a Pod
 
 **Note**: The below example assumes a pod called `portforward-example` exists with port 80 serving HTTP (such as a base nginx image).
 
