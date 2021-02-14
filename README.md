@@ -51,7 +51,7 @@ $options->setToken('some-secret-token-value-goes-here');
 $k8s = new K8s($options);
 ```
 
-**Note** If you need to perform certificate based authentication, check the options for the HttpClient you are using.
+**Note**: If you need to perform certificate based authentication, check the options for the HttpClient you are using.
 
 ### List all Pods
 
@@ -322,7 +322,7 @@ $archive->extractTo(__DIR__ . '/podFiles');
 
 ### Port Forwarding to a Pod
 
-**Note**: The below example assumes a pod called "portforward-example" exists with port 80 serving HTTP (such as a base nginx image).
+**Note**: The below example assumes a pod called `portforward-example` exists with port 80 serving HTTP (such as a base nginx image).
 
 Create a class that reacts to port forwarding events:
 
