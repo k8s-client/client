@@ -151,4 +151,18 @@ class RequestFactoryTest extends TestCase
 
         $this->assertEquals('GET', $response->getMethod());
     }
+
+    public function testItSetsTheRightMethodWhenPassedExplicitly(): void
+    {
+        $response = $this->subject->makeRequest(
+            '/foo',
+            'foo',
+            null,
+            null,
+            null,
+            'get'
+        );
+
+        $this->assertEquals('GET', $response->getMethod());
+    }
 }

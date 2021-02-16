@@ -69,9 +69,10 @@ class RequestFactory
         string $action,
         ?string $acceptType = null,
         ?string $body = null,
-        ?string $contentType = null
+        ?string $contentType = null,
+        ?string $httpMethod = null
     ): RequestInterface {
-        $httpMethod = self::ACTION_MAP[$action] ?? null;
+        $httpMethod = $httpMethod ?? self::ACTION_MAP[$action] ?? null;
 
         if ($httpMethod === null) {
             throw new HttpException(sprintf(
@@ -80,7 +81,7 @@ class RequestFactory
             ));
         }
         $request = $this->requestFactory->createRequest(
-            $httpMethod,
+            strtoupper($httpMethod),
             $uri
         );
 

@@ -66,6 +66,7 @@ class HttpClient
     {
         $model = $options['model'] ?? null;
         $body = $options['body'] ?? null;
+        $method = $options['method'] ?? null;
 
         $encodedBody = null;
         if ($body) {
@@ -90,7 +91,8 @@ class HttpClient
                 $action,
                 $acceptType,
                 $encodedBody,
-                $contentType
+                $contentType,
+                $method
             );
 
             $response = $this->client->sendRequest($request);
