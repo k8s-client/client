@@ -1,3 +1,7 @@
+1.4.1 (2021-02-15)
+--
+* Fix proxy service methods by always preferring an explicit HTTP method if passed in.
+
 1.4.0 (2021-02-14)
 --
 * Add the ability to port-forward from a pod.
