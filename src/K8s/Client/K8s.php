@@ -21,6 +21,8 @@ use K8s\Client\Kind\PodExecService;
 use K8s\Client\Kind\PodLogService;
 use K8s\Client\Kind\PortForwardService;
 use K8s\Core\PatchInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 class K8s
 {
@@ -281,6 +283,20 @@ class K8s
             $kindFqcn,
             $query,
             $namespace
+        );
+    }
+
+    /**
+     * Proxy an HTTP request to a Pod, Service, or Node Kind object. The raw response object is returned.
+     *
+     * @param object $kind The Kind object model.
+     * @param RequestInterface $request The request to proxy to the Kind.
+     */
+    public function proxy(object $kind, RequestInterface $request): ResponseInterface
+    {
+        return $this->factory->makeKindManager()->proxy(
+            $kind,
+            $request
         );
     }
 

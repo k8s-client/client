@@ -24,7 +24,7 @@ trait ResponseTrait
 
     protected function isResponseError(ResponseInterface $response): bool
     {
-        return $response->getStatusCode() >= 400 && $response->getStatusCode() <= 500;
+        return $response->getStatusCode() >= 400 && $response->getStatusCode() <= 599;
     }
 
     protected function isResponseContentType(ResponseInterface $response, string $contentType): bool

@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace unit\K8s\Client\Http;
 
 use K8s\Client\Http\Contract\ResponseHandlerInterface;
+use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Http\HttpClient;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Http\ResponseHandlerFactory;
 use K8s\Client\Serialization\Serializer;
-use K8s\Core\Exception\HttpException;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -89,11 +89,13 @@ class HttpClientTest extends TestCase
         $this->assertEquals('bar', $result);
     }
 
-    public function testItThrowsAnHttpExceptionIfNotHandlerWasFound(): void
+    public function testItThrowsHttpExceptionIfNoHandlerWasFound(): void
     {
         $response = \Mockery::spy(ResponseInterface::class);
         $response->shouldReceive('getStatusCode')
-            ->andReturn(401);
+            ->andReturn(601);
+        $response->shouldReceive('getReasonPhrase')
+            ->andReturn('oh no');
         $this->client->shouldReceive('sendRequest')
             ->andReturn($response);
 
@@ -102,15 +104,14 @@ class HttpClientTest extends TestCase
         ]);
 
         $this->expectException(HttpException::class);
-        $this->expectExceptionCode(401);
-        $this->expectExceptionMessage('There was no supported handler found for the API response to path: /foo');
+        $this->expectExceptionMessage('oh no');
         $this->subject->send('/foo', 'bar', []);
     }
 
     public function testItThrowsAnHttpExceptionIfTheClientExceptionIsThrown(): void
     {
         $exception = new class extends \Exception implements ClientExceptionInterface {
-            public function __construct(string $message = "The HTTP Request Failed.", int $code = 500, Throwable $previous = null)
+            public function __construct(string $message = "Network failure?.", int $code = 3, Throwable $previous = null)
             {
                 parent::__construct($message, $code, $previous);
             }
@@ -126,9 +127,7 @@ class HttpClientTest extends TestCase
             'supports' => false,
         ]);
 
-        $this->expectException(HttpException::class);
-        $this->expectExceptionCode(500);
-        $this->expectExceptionMessage('The HTTP Request Failed');
+        $this->expectException(get_class($exception));
         $this->subject->send('/foo', 'bar', []);
     }
 }

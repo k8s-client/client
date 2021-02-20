@@ -3,7 +3,7 @@
 k8s-client is a Kubernetes API client for PHP.
 
 * HTTP Client agnostic (supports any [PSR-18 compatible HTTP Client](https://packagist.org/providers/psr/http-client-implementation))
-* Supports all major API operations (read, watch, list, patch, delete, exec, attach, logs, port-forward, etc)
+* Supports all major API operations (read, watch, list, patch, delete, exec, attach, logs, port-forward, proxy, etc)
 * Supports all Kinds from the Kubernetes API (via auto-generated Kind models with annotations and type-hints).
 * Pluggable websocket adapter support (For executing commands in pods, attaching, port-forwarding, etc)
 
@@ -26,6 +26,7 @@ The Kind models are auto-generated nightly for the last 10 versions of the Kuber
     * [Download Files form a Pod](#download-files-from-a-pod)
     * [Upload Files to a Pod](#upload-files-to-a-pod)
     * [Port Forwarding from a Pod](#port-forwarding-from-a-pod)
+    * [Proxy HTTP Requests to a Pod](#proxy-http-requests-to-a-pod)
 
 ## Installation
 
@@ -186,6 +187,33 @@ $result = $k8s->create($deployment);
 
 # Create for a deployment will return a Status object for the creation
 var_dump($result);
+```
+
+### Proxy HTTP requests to a Pod
+
+The proxy method sends an HTTP request to a path of a pod, service, or node. It makes no assumptions about what type of
+HTTP request you want to send, so it accepts a standard PSR-7 RequestInterface and returns a ResponseInterface.
+
+```php
+use Http\Discovery\Psr17FactoryDiscovery;
+use K8s\Api\Model\Api\Core\v1\Pod;
+use K8s\Client\K8s;
+use K8s\Client\Options;
+
+$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+
+# Get the pod you want to proxy to first
+$pod = $k8s->read('web', Pod::class);
+
+# Create the HTTP request you'd like to send to it
+$requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+$request = $requestFactory->createRequest('GET', '/');
+
+# Send the request to proxy, dump the results
+# The result will be the raw PSR-7 ResultInterface class.
+$result = $k8s->proxy($pod, $request);
+
+echo (string)$result->getBody().PHP_EOL;
 ```
 
 ### Get Logs for a Pod

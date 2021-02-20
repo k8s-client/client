@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\Options;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Psr\Http\Client\ClientInterface;
@@ -91,5 +92,13 @@ class OptionsTest extends TestCase
         $this->subject->setPassword('foo');
 
         $this->assertEquals('foo', $this->subject->getPassword());
+    }
+
+    public function testGetSetHttpUriFactory(): void
+    {
+        $uriFactory = Psr17FactoryDiscovery::findUriFactory();
+
+        $this->subject->setHttpUriFactory($uriFactory);
+        $this->assertEquals($uriFactory, $this->subject->getHttpUriFactory());
     }
 }

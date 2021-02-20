@@ -19,6 +19,8 @@ use K8s\Client\Http\UriBuilder;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Options;
 use K8s\Core\PatchInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 use ReflectionClass;
 
 class KindManager
@@ -333,6 +335,28 @@ class KindManager
             'watch',
             $options,
             $kindFqcn
+        );
+    }
+
+    /**
+     * Proxy an HTTP request to a Pod, Service, or Node Kind object. The raw response object is returned.
+     *
+     * @param object $kind The Kind object model.
+     * @param RequestInterface $request The request to proxy to the Kind.
+     */
+    public function proxy(object $kind, RequestInterface $request): ResponseInterface
+    {
+        $options['method'] = $request->getMethod();
+        $options['proxy'] = $request;
+
+        return $this->execute(
+            'proxy',
+            $options,
+            $kind,
+            [
+                '{name}' => $this->getObjectName($kind),
+                '{path}' => ltrim((string)$request->getUri(), '/')
+            ]
         );
     }
 

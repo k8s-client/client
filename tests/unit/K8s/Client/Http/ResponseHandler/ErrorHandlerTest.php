@@ -50,11 +50,20 @@ class ErrorHandlerTest extends TestCase
         $this->assertFalse($this->subject->supports($response, []));
     }
 
-    public function testItDoesSupportWhenThereAreErrors(): void
+    public function testItDoesSupportWhenThereAreServerErrors(): void
     {
         $response = \Mockery::spy(ResponseInterface::class);
         $response->shouldReceive('getStatusCode')
-            ->andReturn(500);
+            ->andReturn(504);
+
+        $this->assertTrue($this->subject->supports($response, []));
+    }
+
+    public function testItDoesSupportWhenThereAreClientErrors(): void
+    {
+        $response = \Mockery::spy(ResponseInterface::class);
+        $response->shouldReceive('getStatusCode')
+            ->andReturn(400);
 
         $this->assertTrue($this->subject->supports($response, []));
     }

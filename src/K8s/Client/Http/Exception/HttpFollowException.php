@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace K8s\Client\Http\Exception;
 
-use K8s\Core\Exception\HttpException;
+use K8s\Core\Exception\Exception;
 
-class HttpFollowException extends HttpException
+class HttpFollowException extends Exception
 {
 }

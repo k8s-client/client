@@ -165,6 +165,7 @@ class Factory
             $this->requestFactory = new RequestFactory(
                 $this->options->getHttpRequestFactory() ?? Psr17FactoryDiscovery::findRequestFactory(),
                 $this->makeStreamFactory(),
+                $this->options->getHttpUriFactory() ?? Psr17FactoryDiscovery::findUriFactory(),
                 $this->options
             );
         } catch (NotFoundException $exception) {

@@ -14,11 +14,11 @@ declare(strict_types=1);
 namespace K8s\Client\Http;
 
 use K8s\Client\Exception\InvalidArgumentException;
-use K8s\Core\Exception\HttpException;
+use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Serialization\Serializer;
 use K8s\Core\PatchInterface;
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
 
 class HttpClient
 {
@@ -64,12 +64,13 @@ class HttpClient
      */
     public function send(string $uri, string $action, array $options)
     {
+        $proxy = $options['proxy'] ?? null;
         $model = $options['model'] ?? null;
         $body = $options['body'] ?? null;
         $method = $options['method'] ?? null;
 
         $encodedBody = null;
-        if ($body) {
+        if (!$proxy && $body) {
             $encodedBody = $this->serializer->serialize(
                 ($body instanceof PatchInterface) ? $body->toArray() : $body
             );
@@ -85,7 +86,12 @@ class HttpClient
             $acceptType = RequestFactory::CONTENT_TYPE_JSON;
         }
 
-        try {
+        if ($proxy && $proxy instanceof RequestInterface) {
+            $request = $this->requestFactory->makeFromRequest(
+                $uri,
+                $proxy
+            );
+        } else {
             $request = $this->requestFactory->makeRequest(
                 $uri,
                 $action,
@@ -94,29 +100,17 @@ class HttpClient
                 $contentType,
                 $method
             );
-
-            $response = $this->client->sendRequest($request);
-            $responseHandlers = $this->handlerFactory->makeHandlers($this->serializer);
-
-            foreach ($responseHandlers as $responseHandler) {
-                if ($responseHandler->supports($response, $options)) {
-                    return $responseHandler->handle($response, $options);
-                }
-            }
-
-            throw new HttpException(
-                sprintf(
-                    'There was no supported handler found for the API response to path: %s',
-                    $uri
-                ),
-                $response->getStatusCode()
-            );
-        } catch (ClientExceptionInterface $exception) {
-            throw new HttpException(
-                $exception->getMessage(),
-                $exception->getCode(),
-                $exception
-            );
         }
+
+        $response = $this->client->sendRequest($request);
+        $responseHandlers = $this->handlerFactory->makeHandlers($this->serializer);
+
+        foreach ($responseHandlers as $responseHandler) {
+            if ($responseHandler->supports($response, $options)) {
+                return $responseHandler->handle($response, $options);
+            }
+        }
+
+        throw new HttpException($response);
     }
 }

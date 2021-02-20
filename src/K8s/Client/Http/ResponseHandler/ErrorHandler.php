@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace K8s\Client\Http\ResponseHandler;
 
-use K8s\Core\Exception\HttpException;
+use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Exception\KubernetesException;
 use K8s\Client\Http\HttpClient;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\Status;
@@ -24,10 +24,7 @@ class ErrorHandler extends AbstractHandler
     public function handle(ResponseInterface $response, array $options)
     {
         if (!$this->isResponseContentType($response, HttpClient::CONTENT_TYPE_JSON)) {
-            throw new HttpException(
-                $response->getReasonPhrase(),
-                $response->getStatusCode()
-            );
+            throw new HttpException($response);
         }
 
         /** @var Status $status */

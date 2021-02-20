@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client\Kind;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Api\Model\Api\AdmissionRegistration\v1\MutatingWebhookConfiguration;
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\Status;
@@ -23,6 +24,7 @@ use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Metadata\ModelMetadata;
 use K8s\Client\Metadata\OperationMetadata;
 use K8s\Client\Options;
+use Psr\Http\Message\ResponseInterface;
 use unit\K8s\Client\TestCase;
 
 class KindManagerTest extends TestCase
@@ -299,5 +301,33 @@ class KindManagerTest extends TestCase
 
         $result = $this->subject->replace($pod);
         $this->assertEquals($pod, $result);
+    }
+
+    public function testProxy(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('proxy')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => false,
+        ]);
+
+        $response = \Mockery::spy(ResponseInterface::class);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($response);
+
+        $requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $request = $requestFactory->createRequest('GET', '/');
+
+        $pod = new Pod('foo', []);
+        $result = $this->subject->proxy($pod, $request);
+        $this->assertEquals($response, $result);
     }
 }

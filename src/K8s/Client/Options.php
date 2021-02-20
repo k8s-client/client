@@ -17,6 +17,7 @@ use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 use Psr\SimpleCache\CacheInterface;
 
 class Options
@@ -59,6 +60,11 @@ class Options
      * @var StreamFactoryInterface|null
      */
     private $streamFactory;
+
+    /**
+     * @var UriFactoryInterface|null
+     */
+    private $uriFactory;
 
     /**
      * @var string|null
@@ -132,6 +138,18 @@ class Options
     public function getHttpClient(): ?ClientInterface
     {
         return $this->httpClient;
+    }
+
+    public function setHttpUriFactory(UriFactoryInterface $uriFactory): self
+    {
+        $this->uriFactory = $uriFactory;
+
+        return $this;
+    }
+
+    public function getHttpUriFactory(): ?UriFactoryInterface
+    {
+        return $this->uriFactory;
     }
 
     public function getHttpRequestFactory(): ?RequestFactoryInterface

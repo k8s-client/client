@@ -20,7 +20,13 @@ class SuccessHandler extends AbstractHandler
 {
     public function handle(ResponseInterface $response, array $options)
     {
+        $isProxy = $options['proxy'] ?? false;
         $model = $options['model'] ?? null;
+
+        # In the case of a proxy operation, we return the raw response instead of trying to guess what is wanted.
+        if ($isProxy) {
+            return $response;
+        }
 
         $result = (string)$response->getBody();
         if ($result && $model && $this->isResponseContentType($response, HttpClient::CONTENT_TYPE_JSON)) {

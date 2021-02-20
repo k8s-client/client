@@ -93,4 +93,14 @@ class SuccessHandlerTest extends TestCase
         $this->assertEquals('stuff', $successResponse);
         $this->serializer->shouldNotHaveReceived('deserialize');
     }
+
+    public function testItReturnsTheResponseClassIfItIsProxyRequest(): void
+    {
+        $response = \Mockery::spy(ResponseInterface::class);
+        $options['proxy'] = true;
+
+        $result = $this->subject->handle($response, $options);
+        $this->assertEquals($response, $result);
+    }
+
 }

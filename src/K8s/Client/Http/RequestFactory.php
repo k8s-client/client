@@ -13,11 +13,12 @@ declare(strict_types=1);
 
 namespace K8s\Client\Http;
 
-use K8s\Core\Exception\HttpException;
+use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Options;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\UriFactoryInterface;
 
 class RequestFactory
 {
@@ -50,6 +51,11 @@ class RequestFactory
     private $streamFactory;
 
     /**
+     * @var UriFactoryInterface
+     */
+    private $uriFactory;
+
+    /**
      * @var Options
      */
     private $options;
@@ -57,10 +63,12 @@ class RequestFactory
     public function __construct(
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
+        UriFactoryInterface  $uriFactory,
         Options $options
     ) {
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
+        $this->uriFactory = $uriFactory;
         $this->options = $options;
     }
 
@@ -75,7 +83,7 @@ class RequestFactory
         $httpMethod = $httpMethod ?? self::ACTION_MAP[$action] ?? null;
 
         if ($httpMethod === null) {
-            throw new HttpException(sprintf(
+            throw new RuntimeException(sprintf(
                 'The action "%s" has no recognized HTTP method.',
                 $action
             ));
@@ -101,6 +109,17 @@ class RequestFactory
             );
         }
 
+        return $this->addAuthIfNeeded($request);
+    }
+
+    public function makeFromRequest(string $uri, RequestInterface $request): RequestInterface
+    {
+        return $this->addAuthIfNeeded($request)
+            ->withUri($this->uriFactory->createUri($uri));
+    }
+
+    private function addAuthIfNeeded(RequestInterface $request): RequestInterface
+    {
         if ($this->options->getAuthType() === Options::AUTH_TYPE_TOKEN && $this->options->getToken()) {
             $request = $request->withHeader(
                 'Authorization',

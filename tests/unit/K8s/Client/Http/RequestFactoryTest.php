@@ -14,9 +14,9 @@ declare(strict_types=1);
 namespace unit\K8s\Client\Http;
 
 use Http\Discovery\Psr17FactoryDiscovery;
+use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Options;
-use K8s\Core\Exception\HttpException;
 use unit\K8s\Client\TestCase;
 
 class RequestFactoryTest extends TestCase
@@ -39,13 +39,14 @@ class RequestFactoryTest extends TestCase
         $this->subject = new RequestFactory(
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
+            Psr17FactoryDiscovery::findUriFactory(),
             $this->options
         );
     }
 
-    public function testItThrowsAnHttpExceptionIfTheActionIsNotRecognized(): void
+    public function testItThrowsRuntimeExceptionIfTheActionIsNotRecognized(): void
     {
-        $this->expectException(HttpException::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('The action "bar" has no recognized HTTP method.');
         $this->subject->makeRequest('/foo', 'bar');
     }
