@@ -23,7 +23,7 @@ The Kind models are auto-generated nightly for the last 10 versions of the Kuber
     * [Follow Logs for a Pod](#follow-logs-for-a-pod)
     * [Execute a Command in a Pod](#execute-a-command-in-a-pod-container)
     * [Attach to the Running Process of a Pod](#attach-to-the-running-process-of-a-container-in-a-pod)
-    * [Download Files form a Pod](#download-files-from-a-pod)
+    * [Download Files from a Pod](#download-files-from-a-pod)
     * [Upload Files to a Pod](#upload-files-to-a-pod)
     * [Port Forwarding from a Pod](#port-forwarding-from-a-pod)
     * [Proxy HTTP Requests to a Pod](#proxy-http-requests-to-a-pod)
