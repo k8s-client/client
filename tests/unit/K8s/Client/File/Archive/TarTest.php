@@ -122,6 +122,9 @@ class TarTest extends TestCase
 
     public function testItThrowsExceptionOnToStreamWhenTheArchiveDoesntExistAnymore(): void
     {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
         $this->expectException(FileException::class);
 
         $this->subject->toStream();
