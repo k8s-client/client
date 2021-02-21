@@ -1,3 +1,9 @@
+1.5.0 (2021-02-21)
+--
+* Add the ability to proxy HTTP requests to pod, nodes, and services.
+* Fix how certain error status codes are handled when received.
+* Allow full access to the Response in an HttpException.
+
 1.4.1 (2021-02-15)
 --
 * Fix proxy service methods by always preferring an explicit HTTP method if passed in.
