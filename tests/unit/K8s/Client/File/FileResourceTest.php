@@ -82,6 +82,9 @@ class FileResourceTest extends TestCase
         if ($this->isWindowsPlatform()) {
             $this->markTestSkipped('Resource based tests are not reliable on Windows.');
         }
+        if (version_compare(PHP_VERSION, '7.4', '<')) {
+            $this->markTestSkipped('Test unreliable on PHP < 7.4.');
+        }
 
         touch($this->file);
         $resource = @fopen($this->file, 'r');
