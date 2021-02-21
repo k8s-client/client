@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace integration\K8s\Client\Model;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
@@ -155,6 +156,23 @@ class PodTest extends TestCase
         foreach ($results as $result) {
             $this->assertInstanceOf(Pod::class, $result->getObject());
         }
+    }
+
+    public function testItCanProxyHttpToThePod(): void
+    {
+        $this->createAndWaitForPod(new Pod(
+            'proxy-test',
+            [new Container('proxy-test', 'nginx:latest')]
+        ));
+        $pod = $this->k8s()->read('proxy-test', Pod::class);
+
+        $requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $result = $this->k8s()->proxy(
+            $pod,
+            $requestFactory->createRequest('GET', '/'))
+        ;
+
+        $this->assertStringContainsString('Welcome to nginx', (string)$result->getBody());
     }
 
     public function testItCanEvictThePod(): void
