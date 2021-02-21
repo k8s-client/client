@@ -27,6 +27,9 @@ class FileResource
      */
     private $resource;
 
+    /**
+     * @param resource|null $resource
+     */
     public function __construct(string $file, $resource = null)
     {
         $this->file = $file;
