@@ -90,4 +90,28 @@ class PodLogServiceTest extends TestCase
             ->makePretty()
             ->follow($callable);
     }
+
+    public function testItCanSpecifyPodAndNamespace(): void
+    {
+        $time = new \DateTime();
+        $this->podService->shouldReceive('useNamespace')
+            ->with('bar');
+        $this->podService->shouldReceive('readNamespacedLog')
+            ->with(
+                'my-pod',
+                [
+                    'sinceTime' => $time->format(DATE_ISO8601),
+                    'insecureSkipTLSVerifyBackend' => true,
+                    'follow' => false,
+                ]
+            )
+            ->andReturn('logs');
+
+        $result = $this->subject
+            ->sinceTime($time)
+            ->allowInsecure()
+            ->usePod('my-pod', 'bar')
+            ->read();
+        $this->assertEquals('logs', $result);
+    }
 }

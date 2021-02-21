@@ -24,6 +24,7 @@ use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Metadata\ModelMetadata;
 use K8s\Client\Metadata\OperationMetadata;
 use K8s\Client\Options;
+use K8s\Client\Patch\JsonPatch;
 use Psr\Http\Message\ResponseInterface;
 use unit\K8s\Client\TestCase;
 
@@ -329,5 +330,101 @@ class KindManagerTest extends TestCase
         $pod = new Pod('foo', []);
         $result = $this->subject->proxy($pod, $request);
         $this->assertEquals($response, $result);
+    }
+
+    public function testReplaceStatus(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('put-status')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => true,
+        ]);
+
+        $pod = new Pod('foo', []);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($pod);
+
+        $result = $this->subject->replaceStatus($pod);
+        $this->assertEquals($pod, $result);
+    }
+
+    public function testReadStatus(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('get-status')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => false,
+        ]);
+
+        $status = \Mockery::spy(Status::class);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($status);
+
+        $result = $this->subject->readStatus('foo', Pod::class);
+        $this->assertEquals($status, $result);
+    }
+
+    public function testPatchStatus(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('patch-status')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => false,
+        ]);
+
+        $status = \Mockery::spy(Status::class);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($status);
+
+        $result = $this->subject->patchStatus(new Pod('foo', []), new JsonPatch());
+        $this->assertEquals($status, $result);
+    }
+
+    public function testPatch(): void
+    {
+        $metadata = \Mockery::spy(ModelMetadata::class);
+        $this->metadataCache->shouldReceive('get')
+            ->with(Pod::class)
+            ->andReturn($metadata);
+
+        $operation = \Mockery::spy(OperationMetadata::class);
+        $metadata->shouldReceive('getOperationByType')
+            ->with('patch')
+            ->andReturn($operation);
+
+        $operation->shouldReceive([
+            'isBodyRequired' => false,
+        ]);
+
+        $status = \Mockery::spy(Status::class);
+        $this->httpClient->shouldReceive('send')
+            ->andReturn($status);
+
+        $result = $this->subject->patch(new Pod('foo', []), new JsonPatch());
+        $this->assertEquals($status, $result);
     }
 }

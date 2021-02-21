@@ -24,6 +24,11 @@ class WebsocketClientFactory
     ];
 
     /**
+     * @var class-string[]
+     */
+    private $adapters;
+
+    /**
      * @var WebsocketClientInterface|null
      */
     private $wsAdapter;
@@ -33,12 +38,17 @@ class WebsocketClientFactory
      */
     private $requestFactory;
 
+    /**
+     * @param array|string[] $adapters
+     */
     public function __construct(
         ?WebsocketClientInterface $wsAdapter,
-        RequestFactory $requestFactory
+        RequestFactory $requestFactory,
+        array $adapters = self::ADAPTERS
     ) {
         $this->wsAdapter = $wsAdapter;
         $this->requestFactory = $requestFactory;
+        $this->adapters = $adapters;
     }
 
     /**
@@ -53,7 +63,7 @@ class WebsocketClientFactory
             );
         }
 
-        foreach (self::ADAPTERS as $client) {
+        foreach ($this->adapters as $client) {
             if (class_exists($client)) {
                 return new WebsocketClient(
                     new $client(),
