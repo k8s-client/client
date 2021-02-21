@@ -15,6 +15,7 @@ namespace unit\K8s\Client\File\Archive;
 
 use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\File\Archive\Tar;
+use K8s\Client\File\Exception\FileException;
 use Psr\Http\Message\StreamInterface;
 use unit\K8s\Client\TestCase;
 
@@ -111,11 +112,48 @@ class TarTest extends TestCase
         );
     }
 
+    public function testExtractTo(): void
+    {
+        $this->subject->addFromString('foo', 'bar');
+        $to = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-extract';
+        $this->subject->extractTo($to);
+        $this->assertDirectoryExists($to);
+    }
+
+    public function testItThrowsExceptionOnToStreamWhenTheArchiveDoesntExistAnymore(): void
+    {
+        $this->expectException(FileException::class);
+
+        $this->subject->toStream();
+    }
+
     public function tearDown(): void
     {
         parent::tearDown();
         if (file_exists($this->tmpFile)) {
             @unlink($this->tmpFile);
         }
+        $to = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-extract';
+        if (is_dir($to)) {
+            $this->deleteDir($to);
+        }
+    }
+
+    private function deleteDir(string $dir): void
+    {
+        if (substr($dir, strlen($dir) - 1, 1) != '/') {
+            $dir .= '/';
+        }
+        $files = glob($dir . '*', GLOB_MARK);
+
+        foreach ($files as $file) {
+            if (is_dir($file)) {
+                $this->deleteDir($file);
+            } else {
+                unlink($file);
+            }
+        }
+
+        rmdir($dir);
     }
 }
