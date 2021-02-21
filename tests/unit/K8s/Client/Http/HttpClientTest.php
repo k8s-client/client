@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client\Http;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\Http\Contract\ResponseHandlerInterface;
 use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Http\HttpClient;
@@ -21,6 +22,7 @@ use K8s\Client\Http\ResponseHandlerFactory;
 use K8s\Client\Serialization\Serializer;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Throwable;
 use unit\K8s\Client\TestCase;
@@ -129,5 +131,24 @@ class HttpClientTest extends TestCase
 
         $this->expectException(get_class($exception));
         $this->subject->send('/foo', 'bar', []);
+    }
+
+    public function testItCanSendProxyRequest(): void
+    {
+        $this->serializer->expects('serialize')
+            ->never();
+
+        $this->responseHandler->shouldReceive([
+            'supports' => true,
+            'handle' => \Mockery::spy(RequestInterface::class),
+        ]);
+
+        $requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $streamFactory = Psr17FactoryDiscovery::findStreamFactory();
+        $request = $requestFactory->createRequest('POST', '/foo');
+        $request = $request->withBody($streamFactory->createStream(json_encode(['foo' => 'bar'])));
+
+        $result = $this->subject->send('/foo', 'bar', ['proxy' => $request]);
+        $this->assertInstanceOf(RequestInterface::class, $result);
     }
 }
