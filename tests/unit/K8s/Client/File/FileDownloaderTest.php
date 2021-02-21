@@ -75,4 +75,67 @@ class FileDownloaderTest extends TestCase
         $this->assertInstanceOf(ArchiveInterface::class, $result);
         $this->exec->shouldHaveReceived('command', [$expectedCommand]);
     }
+
+    public function testItDownloadsWithCompression(): void
+    {
+        $this->exec->shouldReceive('useStdout')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useStderr')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useStdin')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('command')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useTty')
+            ->andReturn($this->exec);
+
+        $this->subject->compress();
+        $this->subject->from('/etc');
+        $result = $this->subject->download();
+
+        $expectedCommand = [
+            "tar",
+            "czf",
+            "-",
+            "-C",
+            "/",
+            "etc",
+        ];
+
+        $this->assertInstanceOf(ArchiveInterface::class, $result);
+        $this->exec->shouldHaveReceived('command', [$expectedCommand]);
+    }
+
+    public function testItDownloadsToSpecificFileWithContainer(): void
+    {
+        $this->exec->shouldReceive('useStdout')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useStderr')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useStdin')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('command')
+            ->andReturn($this->exec);
+        $this->exec->shouldReceive('useTty')
+            ->andReturn($this->exec);
+
+        $to = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'test-to.tar';
+        $this->subject->from('/etc');
+        $this->subject->to($to);
+        $this->subject->useContainer('meh');
+        $result = $this->subject->download();
+
+        $expectedCommand = [
+            "tar",
+            "cf",
+            "-",
+            "-C",
+            "/",
+            "etc",
+        ];
+
+        $this->assertInstanceOf(ArchiveInterface::class, $result);
+        $this->exec->shouldHaveReceived('command', [$expectedCommand]);
+        $this->exec->shouldHaveReceived('useContainer', ['meh']);
+    }
 }
