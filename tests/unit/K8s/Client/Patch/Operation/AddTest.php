@@ -48,7 +48,9 @@ class AddTest extends TestCase
 
     public function testGetPath(): void
     {
-        $this->assertEquals('/foo', $this->subject->getPath());
+        $this->subject->setPath('/bar');
+
+        $this->assertEquals('/bar', $this->subject->getPath());
     }
 
     public function testToArray(): void
