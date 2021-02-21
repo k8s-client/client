@@ -16,9 +16,9 @@ namespace K8s\Client\Websocket;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Websocket\Contract\PortForwardInterface;
 use K8s\Client\Websocket\FrameHandler\PortForwardHandler;
+use K8s\Core\Exception\WebsocketException;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use K8s\Client\Websocket\FrameHandler\ExecHandler;
-use K8s\Client\Websocket\FrameHandler\GenericHandler;
 use Psr\Http\Message\RequestInterface;
 
 class WebsocketClient
@@ -62,7 +62,10 @@ class WebsocketClient
                 );
                 break;
             default:
-                $frameHandler = new GenericHandler($handler);
+                throw new WebsocketException(sprintf(
+                    'The websocket action type "%s" is not currently supported.',
+                    $type
+                ));
         }
 
         $this->adapter->connect(

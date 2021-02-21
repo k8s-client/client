@@ -18,6 +18,7 @@ use K8s\Client\Websocket\FrameHandler\ExecHandler;
 use K8s\Client\Websocket\FrameHandler\GenericHandler;
 use K8s\Client\Websocket\FrameHandler\PortForwardHandler;
 use K8s\Client\Websocket\WebsocketClient;
+use K8s\Core\Exception\WebsocketException;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Nyholm\Psr7\Request;
 use Psr\Http\Message\RequestInterface;
@@ -85,20 +86,14 @@ class WebsocketClientTest extends TestCase
         );
     }
 
-    public function testItUsesTheGenericHandlerOnConnectForNonExec(): void
+    public function testItThrowsAnExceptionOnConnectForUnknownType(): void
     {
         $request = new Request('GET', '/foo');
         $this->requestFactory->shouldReceive('makeRequest')
             ->andReturn($request);
         $callable = function () {};
 
+        $this->expectException(WebsocketException::class);
         $this->subject->connect('/foo', 'foo', $callable);
-        $this->adapter->shouldHaveReceived(
-            'connect',
-            [
-                \Mockery::type(RequestInterface::class),
-                \Mockery::type(GenericHandler::class)
-            ]
-        );
     }
 }
