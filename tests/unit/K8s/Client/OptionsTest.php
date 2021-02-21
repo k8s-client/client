@@ -101,4 +101,32 @@ class OptionsTest extends TestCase
         $this->subject->setHttpUriFactory($uriFactory);
         $this->assertEquals($uriFactory, $this->subject->getHttpUriFactory());
     }
+
+    public function testGetSetEndpoint(): void
+    {
+        $this->subject->setEndpoint('https://foo');
+        $this->assertEquals('https://foo', $this->subject->getEndpoint());
+    }
+
+    public function testGetSetNamespace(): void
+    {
+        $this->subject->setNamespace('meh');
+        $this->assertEquals('meh', $this->subject->getNamespace());
+    }
+
+    public function testGetSetHttpRequestFactory(): void
+    {
+        $requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+
+        $this->subject->setHttpRequestFactory($requestFactory);
+        $this->assertEquals($requestFactory, $this->subject->getHttpRequestFactory());
+    }
+
+    public function testGetSetStreamFactory(): void
+    {
+        $streamFactory = Psr17FactoryDiscovery::findStreamFactory();
+
+        $this->subject->setStreamFactory($streamFactory);
+        $this->assertEquals($streamFactory, $this->subject->getStreamFactory());
+    }
 }

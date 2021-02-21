@@ -95,6 +95,22 @@ class TarTest extends TestCase
         $this->assertEquals($expected, $this->subject->getUploadCommand());
     }
 
+    public function testGetRealPath(): void
+    {
+        $this->assertEquals(
+            $this->tmpFile,
+            $this->subject->getRealPath()
+        );
+    }
+
+    public function testToString(): void
+    {
+        $this->assertEquals(
+            $this->tmpFile,
+            (string)$this->subject
+        );
+    }
+
     public function tearDown(): void
     {
         parent::tearDown();
