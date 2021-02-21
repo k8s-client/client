@@ -166,4 +166,15 @@ class RequestFactoryTest extends TestCase
 
         $this->assertEquals('GET', $response->getMethod());
     }
+
+    public function testItCanMakeFromRequest(): void
+    {
+        $requestFactory = Psr17FactoryDiscovery::findRequestFactory();
+        $result = $this->subject->makeFromRequest(
+            '/foo',
+            $requestFactory->createRequest('GET', '/bar')
+        );
+
+        $this->assertEquals('/foo', (string)$result->getUri());
+    }
 }
