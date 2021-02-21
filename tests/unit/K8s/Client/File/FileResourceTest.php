@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client\File;
 
+use K8s\Client\File\Exception\FileException;
 use K8s\Client\File\FileResource;
 use unit\K8s\Client\TestCase;
 
@@ -64,6 +65,30 @@ class FileResourceTest extends TestCase
         $this->subject->close();
 
         $this->assertTrue(file_exists($this->file));
+    }
+
+    public function testItThrowsExceptionWhenTheFileCannotBeOpened(): void
+    {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
+        $this->expectException(FileException::class);
+        $this->subject = new FileResource('/this/should/never/exist/I/hope');
+        $this->subject->write('foo');
+    }
+
+    public function testItThrowsExceptionWhenTheFileCannotBeWritten(): void
+    {
+        if ($this->isWindowsPlatform()) {
+            $this->markTestSkipped('Resource based tests are not reliable on Windows.');
+        }
+
+        touch($this->file);
+        $resource = @fopen($this->file, 'r');
+        $this->subject = new FileResource($this->file,  $resource);
+
+        $this->expectException(FileException::class);
+        $this->subject->write('bar');
     }
 
     public function tearDown(): void

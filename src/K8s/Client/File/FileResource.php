@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace K8s\Client\File;
 
-use K8s\Client\Exception\RuntimeException;
+use K8s\Client\File\Exception\FileException;
 
 class FileResource
 {
@@ -27,16 +27,17 @@ class FileResource
      */
     private $resource;
 
-    public function __construct(string $file)
+    public function __construct(string $file, $resource = null)
     {
         $this->file = $file;
+        $this->resource = $resource;
     }
 
     public function write(string $data): void
     {
-        $result = fwrite($this->resource(), $data);
+        $result = @fwrite($this->resource(), $data);
         if ($result === false) {
-            throw new RuntimeException(sprintf(
+            throw new FileException(sprintf(
                 'Unable to write to file: %s',
                 $this->file
             ));
@@ -45,8 +46,8 @@ class FileResource
 
     public function close(): void
     {
-        if (!fclose($this->resource())) {
-            throw new RuntimeException(sprintf(
+        if (!@fclose($this->resource())) {
+            throw new FileException(sprintf(
                 'Unable to close file: %s',
                 $this->file
             ));
@@ -62,8 +63,8 @@ class FileResource
         if ($this->resource) {
             $this->close();
         }
-        if (!unlink($this->file)) {
-            throw new RuntimeException(sprintf(
+        if (!@unlink($this->file)) {
+            throw new FileException(sprintf(
                 'Unable to delete file: %s',
                 $this->file
             ));
@@ -83,9 +84,9 @@ class FileResource
         if ($this->resource) {
             return $this->resource;
         }
-        $this->resource = fopen($this->file, 'w');
+        $this->resource = @fopen($this->file, 'w');
         if ($this->resource === false) {
-            throw new RuntimeException(sprintf(
+            throw new FileException(sprintf(
                 'Unable to open file for writing: %s',
                 $this->file
             ));
