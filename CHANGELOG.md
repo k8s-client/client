@@ -1,3 +1,7 @@
+1.5.1 (2021-02-28)
+--
+* Add the Swoole based websocket class to the websocket factory.
+
 1.5.0 (2021-02-21)
 --
 * Add the ability to proxy HTTP requests to pod, nodes, and services.

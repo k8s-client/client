@@ -21,6 +21,7 @@ class WebsocketClientFactory
 {
     private const ADAPTERS = [
         'K8s\WsRatchet\RatchetWebsocketAdapter',
+        'K8s\WsSwoole\CoroutineAdapter',
     ];
 
     /**
