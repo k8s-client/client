@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace K8s\Client\KubeConfig\Model;
 
+use K8s\Client\Exception\RuntimeException;
+
 class User
 {
     /**
@@ -27,8 +29,16 @@ class User
 
     public function getAuthType(): string
     {
-        if ($this->getClientKey() !== null) {
-            return '';
+        if ($this->getClientKey() !== null || $this->getClientKeyData() !== null) {
+            return 'certificate';
+        } elseif ($this->getExec() !== null) {
+            return 'token';
+        } elseif ($this->getToken() !== null || $this->getTokenFile() !== null) {
+            return 'token';
+        } elseif ($this->getUsername() !== null) {
+            return 'basic';
+        } else {
+            throw new RuntimeException('Unable to determine the auth type defined for the user.');
         }
     }
 

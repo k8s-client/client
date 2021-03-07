@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client\KubeConfig\Model;
 
+use K8s\Client\Exception\RuntimeException;
 use K8s\Client\KubeConfig\Model\User;
 use K8s\Client\KubeConfig\Model\UserExec;
 use unit\K8s\Client\TestCase;
@@ -81,5 +82,91 @@ class UserTest extends TestCase
     public function testGetExec(): void
     {
         $this->assertInstanceOf(UserExec::class, $this->subject->getExec());
+    }
+
+    public function testGetAuthTypeForCertWithKey(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'client-key' => 'key',
+            ]
+        ]);
+
+        $this->assertEquals('certificate', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeForCertWithKeyData(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'client-key-data' => 'key',
+            ]
+        ]);
+
+        $this->assertEquals('certificate', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeForExec(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'exec' => ['command' => 'foo'],
+            ]
+        ]);
+
+        $this->assertEquals('token', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeForToken(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'token' => 'foo',
+            ]
+        ]);
+
+        $this->assertEquals('token', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeForTokenFromFile(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'token-file' => 'foo',
+            ]
+        ]);
+
+        $this->assertEquals('token', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeForBasic(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'username' => 'foo',
+                'password' => 'bar',
+            ]
+        ]);
+
+        $this->assertEquals('basic', $this->subject->getAuthType());
+    }
+
+    public function testGetAuthTypeWhenNoneIsSupported(): void
+    {
+        $this->subject = new User([
+            'name' => 'foo',
+            'user' => [
+                'foo' => 'bar'
+            ]
+        ]);
+
+        $this->expectException(RuntimeException::class);
+        $this->subject->getAuthType();
     }
 }
