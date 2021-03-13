@@ -17,14 +17,17 @@ use K8s\Api\Service\ServiceFactory;
 use K8s\Client\Factory;
 use K8s\Client\File\ArchiveFactory;
 use K8s\Client\Http\HttpClient;
+use K8s\Client\Http\HttpClientFactory;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Http\UriBuilder;
 use K8s\Client\Kind\KindManager;
+use K8s\Client\KubeConfig\ContextConfigFactory;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Options;
 use K8s\Client\Serialization\Contract\DenormalizerInterface;
 use K8s\Client\Serialization\Contract\NormalizerInterface;
 use K8s\Client\Serialization\Serializer;
+use K8s\Client\Websocket\WebsocketAdapterFactory;
 use K8s\Client\Websocket\WebsocketClientFactory;
 use K8s\Core\Contract\ApiInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -131,5 +134,26 @@ class FactoryTest extends TestCase
         $result = $this->subject->makeArchiveFactory();
 
         $this->assertInstanceOf(ArchiveFactory::class, $result);
+    }
+
+    public function testItMakesTheHttpClientFactory(): void
+    {
+        $result = $this->subject->makeHttpClientFactory();
+
+        $this->assertInstanceOf(HttpClientFactory::class, $result);
+    }
+
+    public function testItMakesTheWebsocketAdapterFactory(): void
+    {
+        $result = $this->subject->makeWebsocketAdapterFactory();
+
+        $this->assertInstanceOf(WebsocketAdapterFactory::class, $result);
+    }
+
+    public function testItMakesTheContextConfigFactory(): void
+    {
+        $result = $this->subject->makeContextConfigFactory();
+
+        $this->assertInstanceOf(ContextConfigFactory::class, $result);
     }
 }

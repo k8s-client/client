@@ -25,6 +25,11 @@ use K8s\Client\Options;
 class K8sTest extends TestCase
 {
     /**
+     * @var Options
+     */
+    private $options;
+
+    /**
      * @var K8s
      */
     private $subject;
@@ -32,7 +37,8 @@ class K8sTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->subject = new K8s(new Options('https://foo'));
+        $this->options = new Options('https://foo');
+        $this->subject = new K8s($this->options);
     }
 
     public function testLogsReturnsLogClass(): void
@@ -82,5 +88,10 @@ class K8sTest extends TestCase
         $result = $this->subject->portforward('foo', [80, 443]);
 
         $this->assertInstanceOf(PortForwardService::class, $result);
+    }
+
+    public function testGetOptions(): void
+    {
+        $this->assertEquals($this->options, $this->subject->getOptions());
     }
 }

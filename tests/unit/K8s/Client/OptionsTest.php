@@ -15,6 +15,8 @@ namespace unit\K8s\Client;
 
 use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\Options;
+use K8s\Core\Contract\HttpClientFactoryInterface;
+use K8s\Core\Contract\WebsocketClientFactoryInterface;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\SimpleCache\CacheInterface;
@@ -128,5 +130,21 @@ class OptionsTest extends TestCase
 
         $this->subject->setStreamFactory($streamFactory);
         $this->assertEquals($streamFactory, $this->subject->getStreamFactory());
+    }
+
+    public function testGetSetWebsocketClientFactory(): void
+    {
+        $factory = \Mockery::spy(WebsocketClientFactoryInterface::class);
+
+        $this->subject->setWebsocketClientFactory($factory);
+        $this->assertEquals($factory, $this->subject->getWebsocketClientFactory());
+    }
+
+    public function testGetSetHttpClientFactory(): void
+    {
+        $factory = \Mockery::spy(HttpClientFactoryInterface::class);
+
+        $this->subject->setHttpClientFactory($factory);
+        $this->assertEquals($factory, $this->subject->getHttpClientFactory());
     }
 }

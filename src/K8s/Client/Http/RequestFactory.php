@@ -14,7 +14,9 @@ declare(strict_types=1);
 namespace K8s\Client\Http;
 
 use K8s\Client\Exception\RuntimeException;
+use K8s\Client\KubeConfig\ContextConfigFactory;
 use K8s\Client\Options;
+use K8s\Core\Contract\ContextConfigInterface;
 use Psr\Http\Message\RequestFactoryInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
@@ -56,20 +58,20 @@ class RequestFactory
     private $uriFactory;
 
     /**
-     * @var Options
+     * @var ContextConfigFactory
      */
-    private $options;
+    private $configFactory;
 
     public function __construct(
         RequestFactoryInterface $requestFactory,
         StreamFactoryInterface $streamFactory,
         UriFactoryInterface  $uriFactory,
-        Options $options
+        ContextConfigFactory $configFactory
     ) {
         $this->requestFactory = $requestFactory;
         $this->streamFactory = $streamFactory;
         $this->uriFactory = $uriFactory;
-        $this->options = $options;
+        $this->configFactory = $configFactory;
     }
 
     public function makeRequest(
@@ -120,17 +122,19 @@ class RequestFactory
 
     private function addAuthIfNeeded(RequestInterface $request): RequestInterface
     {
-        if ($this->options->getAuthType() === Options::AUTH_TYPE_TOKEN && $this->options->getToken()) {
+        $config = $this->configFactory->makeContextConfig();
+
+        if ($config->getAuthType() === ContextConfigInterface::AUTH_TYPE_TOKEN) {
             $request = $request->withHeader(
                 'Authorization',
-                sprintf('Bearer %s', $this->options->getToken())
+                sprintf('Bearer %s', $config->getToken())
             );
-        } elseif ($this->options->getAuthType() === Options::AUTH_TYPE_BASIC) {
+        } elseif ($config->getAuthType() === Options::AUTH_TYPE_BASIC) {
             $request = $request->withHeader(
                 'Authorization',
                 sprintf(
                     'Basic %s',
-                    base64_encode("{$this->options->getUsername()}:{$this->options->getPassword()}")
+                    base64_encode("{$config->getUsername()}:{$config->getPassword()}")
                 )
             );
         }

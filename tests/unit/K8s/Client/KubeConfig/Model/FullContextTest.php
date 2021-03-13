@@ -48,7 +48,9 @@ class FullContextTest extends TestCase
                 'name' => 'user1',
                 'user' => [
                     'client-certificate' => 'cert',
+                    'client-certificate-data' => 'cert-data',
                     'client-key' => 'key',
+                    'client-key-data' => 'key-data',
                     'token' => 'token',
                     'token-file' => 'file',
                     'username' => 'username',
@@ -101,5 +103,20 @@ class FullContextTest extends TestCase
     public function testGetNamespace(): void
     {
         $this->assertEquals('namespace', $this->subject->getNamespace());
+    }
+
+    public function testGetAuthType(): void
+    {
+        $this->assertEquals('certificate', $this->subject->getAuthType());
+    }
+
+    public function testGetUserClientCertificateData(): void
+    {
+        $this->assertEquals('cert-data', $this->subject->getUserClientCertificateData());
+    }
+
+    public function testGetUserClientKeyData(): void
+    {
+        $this->assertEquals('key-data', $this->subject->getUserClientKeyData());
     }
 }

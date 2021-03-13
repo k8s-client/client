@@ -15,41 +15,25 @@ namespace K8s\Client\Websocket;
 
 use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Http\RequestFactory;
-use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 
 class WebsocketClientFactory
 {
-    private const ADAPTERS = [
-        'K8s\WsRatchet\RatchetWebsocketAdapter',
-        'K8s\WsSwoole\CoroutineAdapter',
-    ];
-
     /**
-     * @var class-string[]
+     * @var WebsocketAdapterFactory
      */
-    private $adapters;
-
-    /**
-     * @var WebsocketClientInterface|null
-     */
-    private $wsAdapter;
+    private $adapterFactory;
 
     /**
      * @var RequestFactory
      */
     private $requestFactory;
 
-    /**
-     * @param array|string[] $adapters
-     */
     public function __construct(
-        ?WebsocketClientInterface $wsAdapter,
-        RequestFactory $requestFactory,
-        array $adapters = self::ADAPTERS
+        WebsocketAdapterFactory $adapterFactory,
+        RequestFactory $requestFactory
     ) {
-        $this->wsAdapter = $wsAdapter;
+        $this->adapterFactory = $adapterFactory;
         $this->requestFactory = $requestFactory;
-        $this->adapters = $adapters;
     }
 
     /**
@@ -57,24 +41,9 @@ class WebsocketClientFactory
      */
     public function makeClient(): WebsocketClient
     {
-        if ($this->wsAdapter) {
-            return new WebsocketClient(
-                $this->wsAdapter,
-                $this->requestFactory
-            );
-        }
-
-        foreach ($this->adapters as $client) {
-            if (class_exists($client)) {
-                return new WebsocketClient(
-                    new $client(),
-                    $this->requestFactory
-                );
-            }
-        }
-
-        throw new RuntimeException(
-            'To use Kubernetes API requests that require websockets, you must install a websocket library. See this libraries documentation for more information.'
+        return new WebsocketClient(
+            $this->adapterFactory->makeAdapter(),
+            $this->requestFactory
         );
     }
 }

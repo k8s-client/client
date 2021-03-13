@@ -17,6 +17,7 @@ use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\Http\Contract\ResponseHandlerInterface;
 use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Http\HttpClient;
+use K8s\Client\Http\HttpClientFactory;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Http\ResponseHandlerFactory;
 use K8s\Client\Serialization\Serializer;
@@ -59,18 +60,25 @@ class HttpClientTest extends TestCase
      */
     private $subject;
 
+    /**
+     * @var HttpClientFactory|\Mockery\LegacyMockInterface|\Mockery\MockInterface
+     */
+    private $clientFactory;
+
     public function setUp(): void
     {
         parent::setUp();
+        $this->clientFactory = \Mockery::spy(HttpClientFactory::class);
         $this->requestFactory = \Mockery::spy(RequestFactory::class);
         $this->client = \Mockery::spy(ClientInterface::class);
         $this->serializer = \Mockery::spy(Serializer::class);
         $this->handlerFactory = \Mockery::spy(ResponseHandlerFactory::class);
         $this->responseHandler = \Mockery::spy(ResponseHandlerInterface::class);
         $this->handlerFactory->shouldReceive('makeHandlers')->andReturn([$this->responseHandler]);
+        $this->clientFactory->shouldReceive('makeClient')->andReturn($this->client);
         $this->subject = new HttpClient(
             $this->requestFactory,
-            $this->client,
+            $this->clientFactory,
             $this->serializer,
             $this->handlerFactory
         );

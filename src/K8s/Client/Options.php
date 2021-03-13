@@ -13,6 +13,10 @@ declare(strict_types=1);
 
 namespace K8s\Client;
 
+use K8s\Client\KubeConfig\Model\FullContext;
+use K8s\Core\Contract\ContextConfigInterface;
+use K8s\Core\Contract\HttpClientFactoryInterface;
+use K8s\Core\Contract\WebsocketClientFactoryInterface;
 use K8s\Core\Websocket\Contract\WebsocketClientInterface;
 use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestFactoryInterface;
@@ -22,9 +26,9 @@ use Psr\SimpleCache\CacheInterface;
 
 class Options
 {
-    public const AUTH_TYPE_BASIC = 'basic';
+    public const AUTH_TYPE_BASIC = ContextConfigInterface::AUTH_TYPE_BASIC;
 
-    public const AUTH_TYPE_TOKEN = 'token';
+    public const AUTH_TYPE_TOKEN = ContextConfigInterface::AUTH_TYPE_TOKEN;
 
     /**
      * @var string
@@ -85,6 +89,21 @@ class Options
      * @var string
      */
     private $authType = self::AUTH_TYPE_TOKEN;
+
+    /**
+     * @var FullContext|null
+     */
+    private $configContext;
+
+    /**
+     * @var HttpClientFactoryInterface|null
+     */
+    private $httpClientFactory;
+
+    /**
+     * @var WebsocketClientFactoryInterface|null
+     */
+    private $websocketClientFactory;
 
     public function __construct(string $endpoint, string $namespace = 'default')
     {
@@ -232,6 +251,42 @@ class Options
     public function setWebsocketClient(WebsocketClientInterface $websocketClient): self
     {
         $this->websocketClient = $websocketClient;
+
+        return $this;
+    }
+
+    public function getKubeConfigContext(): ?FullContext
+    {
+        return $this->configContext;
+    }
+
+    public function setKubeConfigContext(FullContext $context): self
+    {
+        $this->configContext = $context;
+
+        return $this;
+    }
+
+    public function getHttpClientFactory(): ?HttpClientFactoryInterface
+    {
+        return $this->httpClientFactory;
+    }
+
+    public function setHttpClientFactory(HttpClientFactoryInterface $httpClientFactory): self
+    {
+        $this->httpClientFactory = $httpClientFactory;
+
+        return $this;
+    }
+
+    public function getWebsocketClientFactory(): ?WebsocketClientFactoryInterface
+    {
+        return $this->websocketClientFactory;
+    }
+
+    public function setWebsocketClientFactory(WebsocketClientFactoryInterface $websocketClientFactory): self
+    {
+        $this->websocketClientFactory = $websocketClientFactory;
 
         return $this;
     }

@@ -98,7 +98,7 @@ class WebsocketClient
             if ($name !== 'ports') {
                 continue;
             }
-            if(!isset($ports[$value])) {
+            if (!isset($ports[$value])) {
                 $ports[] = (int)$value;
             }
         }

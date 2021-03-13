@@ -17,7 +17,6 @@ use K8s\Client\Exception\InvalidArgumentException;
 use K8s\Client\Http\Exception\HttpException;
 use K8s\Client\Serialization\Serializer;
 use K8s\Core\PatchInterface;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\RequestInterface;
 
 class HttpClient
@@ -25,9 +24,9 @@ class HttpClient
     public const CONTENT_TYPE_JSON = 'application/json';
 
     /**
-     * @var ClientInterface
+     * @var HttpClientFactory
      */
-    private $client;
+    private $clientFactory;
 
     /**
      * @var RequestFactory
@@ -46,11 +45,11 @@ class HttpClient
 
     public function __construct(
         RequestFactory $requestFactory,
-        ClientInterface $client,
+        HttpClientFactory $clientFactory,
         Serializer $serializer,
         ?ResponseHandlerFactory $handlerFactory = null
     ) {
-        $this->client = $client;
+        $this->clientFactory = $clientFactory;
         $this->requestFactory = $requestFactory;
         $this->serializer = $serializer;
         $this->handlerFactory = $handlerFactory ?? new ResponseHandlerFactory();
@@ -101,8 +100,8 @@ class HttpClient
                 $method
             );
         }
-
-        $response = $this->client->sendRequest($request);
+        $client = $this->clientFactory->makeClient($this->isStreamingRequest($options));
+        $response = $client->sendRequest($request);
         $responseHandlers = $this->handlerFactory->makeHandlers($this->serializer);
 
         foreach ($responseHandlers as $responseHandler) {
@@ -112,5 +111,13 @@ class HttpClient
         }
 
         throw new HttpException($response);
+    }
+
+    private function isStreamingRequest(array $options): bool
+    {
+        $isFollow = $options['query']['follow'] ?? false;
+        $isWatch = $options['query']['watch'] ?? false;
+
+        return $isFollow || $isWatch;
     }
 }

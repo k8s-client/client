@@ -419,4 +419,14 @@ class K8s
             $this->api()->v1CorePodPortForwardOptions()
         );
     }
+
+    /**
+     * Get the options the client was constructed with.
+     *
+     * @return Options
+     */
+    public function getOptions(): Options
+    {
+        return $this->options;
+    }
 }

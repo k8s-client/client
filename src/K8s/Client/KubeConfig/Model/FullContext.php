@@ -42,9 +42,19 @@ class FullContext
         return $this->user->getClientCertificate();
     }
 
+    public function getUserClientCertificateData(): ?string
+    {
+        return $this->user->getClientCertificateData();
+    }
+
     public function getUserClientKey(): ?string
     {
         return $this->user->getClientKey();
+    }
+
+    public function getUserClientKeyData(): ?string
+    {
+        return $this->user->getClientKeyData();
     }
 
     public function getUserToken(): ?string
@@ -75,6 +85,11 @@ class FullContext
     public function getServerCertificateAuthorityData(): ?string
     {
         return $this->cluster->getCertificateAuthority();
+    }
+
+    public function getAuthType(): string
+    {
+        return $this->user->getAuthType();
     }
 
     public function getServer(): string

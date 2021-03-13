@@ -1,5 +1,14 @@
 <?php
 
+/**
+ * This file is part of the k8s/client library.
+ *
+ * (c) Chad Sikorra <Chad.Sikorra@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 declare(strict_types=1);
 
 namespace K8s\Client;
@@ -8,9 +17,11 @@ use K8s\Client\Exception\RuntimeException;
 use K8s\Client\File\ArchiveFactory;
 use K8s\Client\Http\Api;
 use K8s\Client\Http\HttpClient;
+use K8s\Client\Http\HttpClientFactory;
 use K8s\Client\Http\RequestFactory;
 use K8s\Client\Http\UriBuilder;
 use K8s\Client\Kind\KindManager;
+use K8s\Client\KubeConfig\ContextConfigFactory;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Metadata\MetadataParser;
 use K8s\Client\Serialization\Contract\DenormalizerInterface;
@@ -19,74 +30,89 @@ use K8s\Client\Serialization\ModelDenormalizer;
 use K8s\Client\Serialization\ModelNormalizer;
 use K8s\Client\Serialization\Serializer;
 use K8s\Api\Service\ServiceFactory;
+use K8s\Client\Websocket\WebsocketAdapterFactory;
 use K8s\Client\Websocket\WebsocketClientFactory;
 use Http\Discovery\Exception\NotFoundException;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Http\Discovery\Psr18ClientDiscovery;
 use K8s\Core\Contract\ApiInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 
 class Factory
 {
     /**
+     * @var ContextConfigFactory|null
+     */
+    private $contextConfigFactory = null;
+
+    /**
      * @var ServiceFactory|null
      */
-    private $serviceFactory;
+    private $serviceFactory = null;
+
+    /**
+     * @var HttpClientFactory|null
+     */
+    private $httpClientFactory = null;
 
     /**
      * @var HttpClient|null
      */
-    private $httpClient;
+    private $httpClient = null;
 
     /**
      * @var RequestFactory|null
      */
-    private $requestFactory;
+    private $requestFactory = null;
 
     /**
      * @var Serializer|null
      */
-    private $serializer;
+    private $serializer = null;
 
     /**
      * @var UriBuilder|null
      */
-    private $uriBuilder;
+    private $uriBuilder = null;
+
+    /**
+     * @var WebsocketAdapterFactory|null
+     */
+    private $websocketAdapterFactory = null;
 
     /**
      * @var WebsocketClientFactory|null
      */
-    private $websocketClientFactory;
+    private $websocketClientFactory = null;
 
     /**
      * @var MetadataCache|null
      */
-    private $metadataCache;
+    private $metadataCache = null;
 
     /**
      * @var KindManager|null
      */
-    private $kindManager;
+    private $kindManager = null;
 
     /**
      * @var ApiInterface|null
      */
-    private $api;
+    private $api = null;
 
     /**
      * @var NormalizerInterface|null
      */
-    private $normalizer;
+    private $normalizer = null;
 
     /**
      * @var DenormalizerInterface|null
      */
-    private $denormalizer;
+    private $denormalizer = null;
 
     /**
      * @var ArchiveFactory|null
      */
-    private $archiveFactory;
+    private $archiveFactory = null;
 
     /**
      * @var Options
@@ -166,7 +192,7 @@ class Factory
                 $this->options->getHttpRequestFactory() ?? Psr17FactoryDiscovery::findRequestFactory(),
                 $this->makeStreamFactory(),
                 $this->options->getHttpUriFactory() ?? Psr17FactoryDiscovery::findUriFactory(),
-                $this->options
+                $this->makeContextConfigFactory()
             );
         } catch (NotFoundException $exception) {
             throw new RuntimeException(
@@ -202,25 +228,30 @@ class Factory
         return $this->archiveFactory;
     }
 
+    public function makeHttpClientFactory(): HttpClientFactory
+    {
+        if ($this->httpClientFactory) {
+            return $this->httpClientFactory;
+        }
+        $this->httpClientFactory = new HttpClientFactory(
+            $this->makeContextConfigFactory(),
+            $this->options->getHttpClient(),
+            $this->options->getHttpClientFactory()
+        );
+
+        return $this->httpClientFactory;
+    }
+
     public function makeHttpClient(): HttpClient
     {
         if ($this->httpClient) {
             return $this->httpClient;
         }
-
-        try {
-            $this->httpClient = new HttpClient(
-                $this->makeRequestFactory(),
-                $this->options->getHttpClient() ?? Psr18ClientDiscovery::find(),
-                $this->makeSerializer()
-            );
-        } catch (NotFoundException $exception) {
-            throw new RuntimeException(
-                'You must provide a PSR-18 compatible HTTP Client and a PSR-17 compatible request / stream factory.',
-                $exception->getCode(),
-                $exception
-            );
-        }
+        $this->httpClient = new HttpClient(
+            $this->makeRequestFactory(),
+            $this->makeHttpClientFactory(),
+            $this->makeSerializer()
+        );
 
         return $this->httpClient;
     }
@@ -235,13 +266,36 @@ class Factory
         return $this->uriBuilder;
     }
 
+    public function makeContextConfigFactory(): ContextConfigFactory
+    {
+        if ($this->contextConfigFactory) {
+            return $this->contextConfigFactory;
+        }
+        $this->contextConfigFactory = new ContextConfigFactory($this->options);
+
+        return $this->contextConfigFactory;
+    }
+
+    public function makeWebsocketAdapterFactory(): WebsocketAdapterFactory
+    {
+        if ($this->websocketAdapterFactory) {
+            return $this->websocketAdapterFactory;
+        }
+        $this->websocketAdapterFactory = new WebsocketAdapterFactory(
+            $this->options,
+            $this->makeContextConfigFactory()
+        );
+
+        return $this->websocketAdapterFactory;
+    }
+
     public function makeWebsocketClientFactory(): WebsocketClientFactory
     {
         if ($this->websocketClientFactory) {
             return $this->websocketClientFactory;
         }
         $this->websocketClientFactory = new WebsocketClientFactory(
-            $this->options->getWebsocketClient(),
+            $this->makeWebsocketAdapterFactory(),
             $this->makeRequestFactory()
         );
 

@@ -16,6 +16,7 @@ namespace unit\K8s\Client\Http;
 use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Http\RequestFactory;
+use K8s\Client\KubeConfig\ContextConfigFactory;
 use K8s\Client\Options;
 use unit\K8s\Client\TestCase;
 
@@ -31,16 +32,22 @@ class RequestFactoryTest extends TestCase
      */
     private $options;
 
+    /**
+     * @var ContextConfigFactory
+     */
+    private $configFactory;
+
     public function setUp(): void
     {
         parent::setUp();
         $this->options = new Options('https://foo.local:8443');
         $this->options->setToken('secret-token');
+        $this->configFactory = new ContextConfigFactory($this->options);
         $this->subject = new RequestFactory(
             Psr17FactoryDiscovery::findRequestFactory(),
             Psr17FactoryDiscovery::findStreamFactory(),
             Psr17FactoryDiscovery::findUriFactory(),
-            $this->options
+            $this->configFactory
         );
     }
 
