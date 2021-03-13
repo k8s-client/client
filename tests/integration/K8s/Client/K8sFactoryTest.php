@@ -45,4 +45,20 @@ class K8sFactoryTest extends TestCase
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.crt', $kubeConfig->getUserClientCertificate());
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.key', $kubeConfig->getUserClientKey());
     }
+
+    public function testItCanLoadFromTheKubeConfigData(): void
+    {
+        $config =file_get_contents(__DIR__ . '/../../../resources/.kube/config');
+
+        $result = $this->subject->loadFromKubeConfigData($config);
+        $options = $result->getOptions();
+        $kubeConfig = $options->getKubeConfigContext();
+
+        $this->assertInstanceOf(K8s::class, $result);
+        $this->assertEquals('https://127.0.0.1:8443', $options->getEndpoint());
+        $this->assertEquals('default', $kubeConfig->getNamespace());
+        $this->assertEquals('/home/user/.minikube/ca.crt', $kubeConfig->getServerCertificateAuthority());
+        $this->assertEquals('/home/user/.minikube/profiles/minikube/client.crt', $kubeConfig->getUserClientCertificate());
+        $this->assertEquals('/home/user/.minikube/profiles/minikube/client.key', $kubeConfig->getUserClientKey());
+    }
 }

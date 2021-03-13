@@ -45,7 +45,7 @@ class K8sFactory
     }
 
     /**
-     * Load the k8s client from the default kubeconfig file.
+     * Load the k8s client from the default KubeConfig file (ie. $HOME/.kube/config).
      *
      * @param string|null $contextName A specific context name to use from the config.
      * @param HttpClientFactoryInterface|null $httpClientFactory A factory used to instantiate the HTTP client.
@@ -61,8 +61,32 @@ class K8sFactory
         if ($config === '') {
             throw new RuntimeException('The kubeconfig file is empty.');
         }
-        $kubeconfig = $this->kubeConfigParser->parse($config);
-        $context = $kubeconfig->getFullContext($contextName);
+
+        return $this->loadFromKubeConfigData(
+            $config,
+            $contextName,
+            $httpClientFactory,
+            $websocketClientFactory
+        );
+    }
+
+    /**
+     * Load the k8s client from any raw YAML string of a KubeConfig file.
+     *
+     * @param string $kubeConfig The raw YAML string from a KubeConfig file.
+     * @param string|null $contextName A specific context name to use from the config.
+     * @param HttpClientFactoryInterface|null $httpClientFactory A factory used to instantiate the HTTP client.
+     * @param WebsocketClientFactoryInterface|null $websocketClientFactory A factory used to instantiate the Websocket adapter.
+     * @return K8s
+     */
+    public function loadFromKubeConfigData(
+        string $kubeConfig,
+        ?string $contextName = null,
+        ?HttpClientFactoryInterface $httpClientFactory = null,
+        ?WebsocketClientFactoryInterface $websocketClientFactory = null
+    ): K8s {
+        $kubeConfig = $this->kubeConfigParser->parse($kubeConfig);
+        $context = $kubeConfig->getFullContext($contextName);
 
         return $this->loadFromKubeConfigContext(
             $context,
