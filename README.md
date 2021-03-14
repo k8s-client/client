@@ -12,7 +12,8 @@ The Kind models are auto-generated nightly for the last 10 versions of the Kuber
 * [Installation](#installation)
     * [Using a Specific Kubernetes Version](#using-a-specific-kubernetes-api-version)
     * [Installing a Websocket Adapter](#installing-a-websocket-adapter)
-    * [Constructing the Client](#constructing-the-client)
+    * [Constructing the Client Automatically](#constructing-the-client-automatically)
+    * [Constructing the Client Manually](#constructing-the-client-manually)
 * [Examples](#examples)
     * [List All Pods](#list-all-pods)
     * [Watch All Deployments in a Namespace](#watch-all-deployments-in-a-namespace)
@@ -32,7 +33,17 @@ The Kind models are auto-generated nightly for the last 10 versions of the Kuber
 
 Install using composer:
 
-`composer require k8s/client`
+```shell
+# Install the base client
+composer require k8s/client
+
+# Plan on using the Symfony HttpClient? Install the auto-configuration helper for it.
+composer require k8s/http-symfony
+
+# Plan on needing to use things like executing commands, port-forwarding?
+# Install a websocket adapter.
+composer require k8s/ws-ratchet
+```
 
 This library requires a [PSR-18 compatible HTTP Client](https://packagist.org/providers/psr/http-client-implementation), such as Guzzle or Symfony's HttpClient.
 It can also be given a [PSR-16 compatible Simple Cache implementation](https://packagist.org/providers/psr/simple-cache-implementation) to help speed up the library.
@@ -65,7 +76,19 @@ Swoole based websocket adapter (https://github.com/k8s-client/ws-swoole):
 
 See each library's readme for more configuration information.
 
-### Constructing the Client
+### Constructing the Client Automatically
+
+The easiest way to construct the client is from a pre-defined KubeConfig:
+
+```php
+use K8s\Client\K8sFactory;
+
+$k8s = (new K8sFactory())->loadFromKubeConfig();
+```
+
+**Note**: This requires the use of an HttpClient factory helper. Install one of `k8s/http-symfony` or `k8s/http-guzzle`.
+
+### Constructing the Client Manually
 
 Construct the client with your needed options:
 
@@ -90,10 +113,9 @@ Also check the configuration for the websocket adapter you are using.
 
 ```php
 use K8s\Api\Model\Api\Core\v1\Pod;
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 /** @var Pod $pod */
 foreach ($k8s->listAll(Pod::class) as $pod) {
@@ -111,10 +133,9 @@ foreach ($k8s->listAll(Pod::class) as $pod) {
 ```php
 use K8s\Api\Model\Api\Apps\v1\Deployment;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $count = 0;
 
@@ -145,10 +166,9 @@ $k8s->watchNamespaced(function (WatchEvent $event) use (&$count) {
 ```php
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # Create a pod with the name "web" using the nginx:latest image...
 $pod = new Pod(
@@ -169,10 +189,9 @@ use K8s\Api\Model\Api\Apps\v1\Deployment;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\LabelSelector;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\PodTemplateSpec;
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # All deployments need a "template" that describes the Pod spec
 $template = new PodTemplateSpec(
@@ -204,10 +223,9 @@ HTTP request you want to send, so it accepts a standard PSR-7 RequestInterface a
 ```php
 use Http\Discovery\Psr17FactoryDiscovery;
 use K8s\Api\Model\Api\Core\v1\Pod;
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # Get the pod you want to proxy to first
 $pod = $k8s->read('web', Pod::class);
@@ -226,10 +244,9 @@ echo (string)$result->getBody().PHP_EOL;
 ### Get Logs for a Pod
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # Read logs from a pod called "web".
 # Also append all log entries with a timestamp (ISO8601)
@@ -243,10 +260,9 @@ var_dump($log);
 ### Follow Logs for a Pod
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $count = 0;
 
@@ -268,10 +284,9 @@ $k8s->logs('web')
 ### Execute a command in a Pod container
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # Print the result of "whoami".
 $k8s->exec('web', '/usr/bin/whoami')
@@ -288,10 +303,9 @@ $k8s->exec('web', '/usr/bin/whoami')
 ### Attach to the running process of a container in a Pod
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 # Attaches to the main running process of the container in the Pod
 $k8s->attach('my-pod')
@@ -312,11 +326,10 @@ $k8s->attach('my-pod')
 
 ```php
 use K8s\Api\Model\Api\Apps\v1\Deployment;
-use K8s\Client\K8s;
 use K8s\Client\Patch\JsonPatch;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $patch = new JsonPatch();
 # Since labels are an array, this actually replaces existing labels
@@ -339,10 +352,9 @@ echo sprintf(
 ### Upload Files to a Pod
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $k8s->uploader('my-pod')
     # Add files from paths.
@@ -358,10 +370,9 @@ $k8s->uploader('my-pod')
 ### Download Files from a Pod
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $archive = $k8s->downloader('my-pod')
     # Optionally choose to compress the downloaded files (gzip -- tar.gz)
@@ -456,11 +467,10 @@ class PortForwarder implements PortForwardInterface
 Use the above class as a handler for the port forward process:
 
 ```php
-use K8s\Client\K8s;
-use K8s\Client\Options;
 use App\PortForwarder;
+use K8s\Client\K8sFactory;
 
-$k8s = new K8s(new Options('https://127.0.0.1:8443'));
+$k8s = (new K8sFactory())->loadFromKubeConfig();
 
 $handler = new PortForwarder();
 # Assuming a Pod with a basic HTTP port 80 exposed...
