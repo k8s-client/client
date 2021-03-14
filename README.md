@@ -1,4 +1,4 @@
-# k8s-client ![](https://github.com/ChadSikorra/k8s-client/workflows/Build/badge.svg) [![codecov](https://codecov.io/gh/ChadSikorra/k8s-client/branch/master/graph/badge.svg)](https://codecov.io/gh/ChadSikorra/k8s-client)
+# k8s-client ![](https://github.com/k8s-client/client/workflows/Build/badge.svg) [![codecov](https://codecov.io/gh/k8s-client/client/branch/master/graph/badge.svg)](https://codecov.io/gh/k8s-client/client)
 
 k8s-client is a Kubernetes API client for PHP.
 
@@ -55,11 +55,11 @@ Kubernetes may not be the same as the `k8s/api` patch version.
 Certain Kuberenetes API endpoints (such as exec, to run commands in a container) require websockets to communicate. If you
 need support for this, install one of these adapters...
 
-ReactPHP based websocket adapter (https://github.com/ChadSikorra/k8s-ws-ratchet):
+ReactPHP based websocket adapter (https://github.com/k8s-client/ws-ratchet):
 
 `composer require k8s/ws-ratchet`
 
-Swoole based websocket adapter (https://github.com/ChadSikorra/k8s-ws-swoole):
+Swoole based websocket adapter (https://github.com/k8s-client/ws-swoole):
 
 `composer require k8s/ws-swoole`
 
