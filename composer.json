@@ -28,19 +28,19 @@
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "^2.0",
+    "k8s/http-symfony": "^1.0",
     "k8s/ws-ratchet": "^1.0",
     "mockery/mockery": "~1.3.0",
-    "nyholm/psr7": "^1.0",
     "php-http/httplug": "^2.0",
     "phpstan/phpstan": "^0.12",
-    "phpunit/phpunit": "^8.5",
-    "symfony/http-client": "^5.1"
+    "phpunit/phpunit": "^8.5"
   },
   "suggest": {
     "k8s/ws-ratchet": "Ratchet based websocket adapter for websocket based API requests.",
-    "symfony/cache": "For a PSR-16 implementation to cache Kubernetes model metadata information.",
-    "nyholm/psr7": "For PSR-7 HTTP request / responses and PSR-17 HTTP factory implementations.",
-    "symfony/http-client": "For a PSR-18 HTTP Client implementation."
+    "k8s/ws-swoole": "Swoole based websocket adapter for websocket based API requests.",
+    "k8s/http-guzzle": "Guzzle based HttpClient for k8s client auto-configuration.",
+    "k8s/http-symfony": "Symfony based HttpClient for k8s client auto-configuration.",
+    "symfony/cache": "For a PSR-16 implementation to cache Kubernetes model metadata information."
   },
   "config": {
     "sort-packages": true
