@@ -117,7 +117,6 @@ class K8sFactory
         if (!$httpClientFactory) {
             foreach (self::HTTPCLIENT_FACTORIES as $clientFactory) {
                 if (class_exists($clientFactory)) {
-                    /** @phpstan-ignore-next-line */
                     $httpClientFactory = new $clientFactory();
                 }
             }
@@ -128,7 +127,6 @@ class K8sFactory
         if (!$websocketClientFactory) {
             foreach (self::WEBSOCKET_FACTORIES as $clientFactory) {
                 if (class_exists($clientFactory)) {
-                    /** @phpstan-ignore-next-line */
                     $websocketClientFactory = new $clientFactory();
                 }
             }
