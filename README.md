@@ -107,7 +107,7 @@ $k8s = new K8s($options);
 **Note**: If you need to perform certificate based authentication, check the options for the HttpClient you are using.
 Also check the configuration for the websocket adapter you are using.
 
-##Examples
+## Examples
 
 ### List all Pods
 
