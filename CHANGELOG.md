@@ -1,3 +1,9 @@
+1.6.0 (2021-03-16)
+--
+* Add a basic KubeConfig parser.
+* Add a K8sFactory to construct the client from a KubeConfig file.
+* Add HttpClientFactory and WebsocketClientFactory support for auto-configuration.
+
 1.5.1 (2021-02-28)
 --
 * Add the Swoole based websocket class to the websocket factory.
