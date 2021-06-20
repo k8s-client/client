@@ -1,3 +1,7 @@
+1.7.0 (2021-06-20)
+--
+*  Allow creating Kind models from array data using newKind().
+
 1.6.0 (2021-03-16)
 --
 * Add a basic KubeConfig parser.
