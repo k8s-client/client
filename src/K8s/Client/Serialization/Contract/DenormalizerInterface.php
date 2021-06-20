@@ -16,7 +16,7 @@ namespace K8s\Client\Serialization\Contract;
 interface DenormalizerInterface
 {
     /**
-     * @param class-string $modelFqcn
+     * @param class-string|null $modelFqcn
      */
-    public function denormalize(array $data, string $modelFqcn): object;
+    public function denormalize(array $data, ?string $modelFqcn = null): object;
 }

@@ -421,6 +421,15 @@ class K8s
     }
 
     /**
+     * @param array<string, mixed> $data The Kind data as an array.
+     * @return object The Model object represented by the data.
+     */
+    public function newKind(array $data): object
+    {
+        return $this->factory->makeDenormalizer()->denormalize($data);
+    }
+
+    /**
      * Get the options the client was constructed with.
      *
      * @return Options

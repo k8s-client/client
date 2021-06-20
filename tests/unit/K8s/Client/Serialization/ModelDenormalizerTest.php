@@ -39,7 +39,7 @@ class ModelDenormalizerTest extends TestCase
 
     public function testItDenormalizes(): void
     {
-        $data =             [
+        $data = [
             'apiVersion' => 'v1',
             'kind' => 'Pod',
             'metadata' => [
@@ -58,6 +58,37 @@ class ModelDenormalizerTest extends TestCase
             $data,
             Pod::class
         );
+
+        $this->assertInstanceOf(Pod::class, $result);
+        /** @var Pod $result */
+
+        $this->assertEquals('foo', $result->getName());
+        $containers = $result->getContainers();
+        $this->assertCount(1, $containers);
+
+        $first = $containers[0];
+        $this->assertEquals('nginx:latest', $first->getImage());
+        $this->assertEquals('web', $first->getName());
+    }
+
+    public function testItFindsTheModelWhenDenormalizing(): void
+    {
+        $data = [
+            'apiVersion' => 'v1',
+            'kind' => 'Pod',
+            'metadata' => [
+                'name' => 'foo',
+            ],
+            'spec' => [
+                'containers' => [
+                    [
+                        'image' => 'nginx:latest',
+                        'name' => 'web',
+                    ],
+                ]
+            ],
+        ];
+        $result = $this->subject->denormalize($data);
 
         $this->assertInstanceOf(Pod::class, $result);
         /** @var Pod $result */

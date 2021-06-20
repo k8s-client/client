@@ -163,6 +163,8 @@ $k8s->watchNamespaced(function (WatchEvent $event) use (&$count) {
 
 ### Create a Pod
 
+Using model classes:
+
 ```php
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
@@ -182,7 +184,37 @@ $pod = $k8s->create($pod);
 var_dump($pod);
 ```
 
+Using array data:
+
+```php
+use K8s\Client\K8sFactory;
+
+$k8s = (new K8sFactory())->loadFromKubeConfig();
+
+# Create a pod with the name "web" using the nginx:latest image...
+# Create will return the updated Pod object after creation in this instance...
+$pod = $k8s->create($k8s->newKind([
+    'apiVersion' => 'v1',
+    'kind' => 'Pod',
+    'metadata' => [
+        'name' => 'web',
+    ],
+    'spec' => [
+        'containers' => [
+            [
+                'image' => 'nginx:latest',
+                'name' => 'web',
+            ],
+        ]
+    ],
+]));
+
+var_dump($pod);
+```
+
 ### Create a Deployment
+
+Using model classes:
 
 ```php
 use K8s\Api\Model\Api\Apps\v1\Deployment;
@@ -210,6 +242,51 @@ $deployment = new Deployment(
 );
 
 $result = $k8s->create($deployment);
+
+# Create for a deployment will return a Status object for the creation
+var_dump($result);
+```
+
+Using array data:
+
+```php
+use K8s\Client\K8sFactory;
+
+$k8s = (new K8sFactory())->loadFromKubeConfig();
+
+# Create a deployment with the given array data matching what you want.
+$result = $k8s->create($k8s->newKind([
+    'apiVersion' => 'apps/v1',
+    'kind' => 'Deployment',
+    'metadata' => [
+        'name' => 'frontend',
+        'labels' => [
+            'app' => 'web',
+        ]
+    ],
+    'spec' => [
+        'selector' => [
+            'matchLabels' => [
+                'app' => 'web',
+            ]
+        ],
+        'template' => [
+            'metadata' => [
+                'labels' => [
+                    'app' => 'web',
+                ]
+            ],   
+            'spec' => [
+                'containers' => [
+                    [
+                        'image' => 'nginx:latest',
+                        'name' => 'frontend',
+                    ],
+                ],
+            ],
+        ],
+    ],
+]));
 
 # Create for a deployment will return a Status object for the creation
 var_dump($result);

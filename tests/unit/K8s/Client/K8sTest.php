@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace unit\K8s\Client;
 
+use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Client\File\FileDownloader;
 use K8s\Client\File\FileUploader;
 use K8s\Client\K8s;
@@ -88,6 +89,27 @@ class K8sTest extends TestCase
         $result = $this->subject->portforward('foo', [80, 443]);
 
         $this->assertInstanceOf(PortForwardService::class, $result);
+    }
+
+    public function testItCreatesTheNewKindFromArrayData(): void
+    {
+        $result = $this->subject->newKind([
+            'apiVersion' => 'v1',
+            'kind' => 'Pod',
+            'metadata' => [
+                'name' => 'foo',
+            ],
+            'spec' => [
+                'containers' => [
+                    [
+                        'image' => 'nginx:latest',
+                        'name' => 'web',
+                    ],
+                ]
+            ],
+        ]);
+
+        $this->assertInstanceOf(Pod::class, $result);
     }
 
     public function testGetOptions(): void

@@ -15,12 +15,14 @@ namespace K8s\Client\Serialization;
 
 use Exception;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
+use K8s\Client\Exception\RuntimeException;
 use K8s\Client\Metadata\ModelPropertyMetadata;
 use K8s\Client\Serialization\Contract\DenormalizerInterface;
 use K8s\Core\Collection;
 use K8s\Client\Metadata\MetadataCache;
 use ReflectionClass;
 use ReflectionObject;
+use UnexpectedValueException;
 
 class ModelDenormalizer implements DenormalizerInterface
 {
@@ -35,10 +37,11 @@ class ModelDenormalizer implements DenormalizerInterface
     }
 
     /**
-     * @param class-string $modelFqcn
+     * @inheritDoc
      */
-    public function denormalize(array $data, string $modelFqcn): object
+    public function denormalize(array $data, ?string $modelFqcn = null): object
     {
+        $modelFqcn = $modelFqcn ?? $this->findFModelFqcnFromData($data);
         $metadata = $this->cache->get($modelFqcn);
 
         $instance = (new ReflectionClass($modelFqcn))->newInstanceWithoutConstructor();
@@ -95,5 +98,37 @@ class ModelDenormalizer implements DenormalizerInterface
         }
 
         return $value;
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     * @return class-string
+     */
+    private function findFModelFqcnFromData(array $data): string
+    {
+        $apiVersion = $data['apiVersion'] ?? null;
+        $kind = $data['kind'] ?? null;
+
+        if (!(is_string($apiVersion) && $apiVersion !== '')) {
+            throw new UnexpectedValueException('The "apiVersion" must be a non-empty string.');
+        }
+        if (!(is_string($kind) && $kind !== '')) {
+            throw new UnexpectedValueException('The "kind" must be a non-empty string.');
+        }
+
+        $modelFqcn = $this->cache->getModelFqcnFromKind(
+            $apiVersion,
+            $kind
+        );
+
+        if ($modelFqcn === null) {
+            throw new RuntimeException(sprintf(
+                'Unable to find a Model for apiVersion "%s" and kind "%s".',
+                $apiVersion,
+                $kind
+            ));
+        }
+
+        return $modelFqcn;
     }
 }
