@@ -57,13 +57,17 @@ class K8s
     /**
      * Create a Kubernetes resource.
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace to create it in (uses default from options if not defined).
-     * @return object
+     * @return T
      */
-    public function create(object $kind, $query = [], ?string $namespace = null): object
-    {
+    public function create(
+        object $kind,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         return $this->factory->makeKindManager()->create(
             $kind,
             $query,
@@ -74,12 +78,15 @@ class K8s
     /**
      * Delete a Kubernetes resource.
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param array $query Any additional query parameters.
-     * @return object
+     * @return T
      */
-    public function delete(object $kind, $query = []): object
-    {
+    public function delete(
+        object $kind,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->delete(
             $kind,
             $query
@@ -89,13 +96,17 @@ class K8s
     /**
      * Read a Kubernetes resource of a specific Kind.
      *
+     * @template T of object
      * @param string $name the name of the resource.
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to read.
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to read.
      * @param array $query Any additional query parameters.
-     * @return object
+     * @return T
      */
-    public function read(string $name, string $kindFqcn, $query = []): object
-    {
+    public function read(
+        string $name,
+        string $kindFqcn,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->read(
             $name,
             $kindFqcn,
@@ -111,8 +122,11 @@ class K8s
      * @param array $query Any additional query parameters.
      * @return object
      */
-    public function readStatus(string $name, string $kindFqcn, $query = []): object
-    {
+    public function readStatus(
+        string $name,
+        string $kindFqcn,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->readStatus(
             $name,
             $kindFqcn,
@@ -127,8 +141,10 @@ class K8s
      * @param array $query Any additional query parameters.
      * @return object Typically the Status object on success.
      */
-    public function deleteAll(string $kindFqcn, $query = []): object
-    {
+    public function deleteAll(
+        string $kindFqcn,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->deleteAll(
             $kindFqcn,
             $query
@@ -143,8 +159,11 @@ class K8s
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      * @return object Typically the Status object on success.
      */
-    public function deleteAllNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
-    {
+    public function deleteAllNamespaced(
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         return $this->factory->makeKindManager()->deleteAllNamespaced(
             $kindFqcn,
             $query,
@@ -159,8 +178,11 @@ class K8s
      * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
      */
-    public function watchAll(callable $handler, string $kindFqcn, $query = []): void
-    {
+    public function watchAll(
+        callable $handler,
+        string $kindFqcn,
+        array $query = []
+    ): void {
         $this->factory->makeKindManager()->watchAll(
             $handler,
             $kindFqcn,
@@ -176,8 +198,12 @@ class K8s
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      */
-    public function watchNamespaced(callable $handler, string $kindFqcn, $query = [], ?string $namespace = null): void
-    {
+    public function watchNamespaced(
+        callable $handler,
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): void {
         $this->factory->makeKindManager()->watchNamespaced(
             $handler,
             $kindFqcn,
@@ -189,12 +215,15 @@ class K8s
     /**
      * List all Kubernetes resource of a specific kind.
      *
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
+     * @template T of object
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
-     * @return iterable<int, object>
+     * @return iterable<T>
      */
-    public function listAll(string $kindFqcn, $query = []): iterable
-    {
+    public function listAll(
+        string $kindFqcn,
+        array $query = []
+    ): iterable {
         return $this->factory->makeKindManager()->listAll(
             $kindFqcn,
             $query
@@ -204,14 +233,19 @@ class K8s
     /**
      * Patch a Kubernetes resource using a patch object (json, strategic, merge).
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param PatchInterface $patch A patch class object.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
-     * @return object This would typically be the same object passed in as the Kind.
+     * @return T This would typically be the same object passed in as the Kind.
      */
-    public function patch(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
-    {
+    public function patch(
+        object $kind,
+        PatchInterface $patch,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         return $this->factory->makeKindManager()->patch(
             $kind,
             $patch,
@@ -229,8 +263,12 @@ class K8s
      * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
      * @return object This would typically be the same object passed in as the Kind.
      */
-    public function patchStatus(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
-    {
+    public function patchStatus(
+        object $kind,
+        PatchInterface $patch,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         return $this->factory->makeKindManager()->patchStatus(
             $kind,
             $patch,
@@ -242,12 +280,15 @@ class K8s
     /**
      * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
      *
-     * @param object $kind The Kind object model.
+     * @template T of object
+     * @param T $kind The Kind object model.
      * @param array $query Any additional query parameters.
-     * @return object The Kind model object being replaced.
+     * @return T The Kind model object being replaced.
      */
-    public function replace(object $kind, array $query = []): object
-    {
+    public function replace(
+        object $kind,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->replace(
             $kind,
             $query
@@ -261,8 +302,10 @@ class K8s
      * @param array $query Any additional query parameters.
      * @return object The Kind model object being replaced.
      */
-    public function replaceStatus(object $kind, array $query = []): object
-    {
+    public function replaceStatus(
+        object $kind,
+        array $query = []
+    ): object {
         return $this->factory->makeKindManager()->replaceStatus(
             $kind,
             $query
@@ -272,13 +315,17 @@ class K8s
     /**
      * List all Kubernetes resource of a specific kind in a namespace.
      *
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
+     * @template T of object
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
-     * @return iterable<int, object>
+     * @return iterable<T>
      */
-    public function listNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): iterable
-    {
+    public function listNamespaced(
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): iterable {
         return $this->factory->makeKindManager()->listNamespaced(
             $kindFqcn,
             $query,
@@ -292,8 +339,10 @@ class K8s
      * @param object $kind The Kind object model.
      * @param RequestInterface $request The request to proxy to the Kind.
      */
-    public function proxy(object $kind, RequestInterface $request): ResponseInterface
-    {
+    public function proxy(
+        object $kind,
+        RequestInterface $request
+    ): ResponseInterface {
         return $this->factory->makeKindManager()->proxy(
             $kind,
             $request
@@ -306,8 +355,10 @@ class K8s
      * @param string $podName The pod name.
      * @param string|null $namespace An optional namespace (Otherwise the default is used).
      */
-    public function logs(string $podName, ?string $namespace = null): PodLogService
-    {
+    public function logs(
+        string $podName,
+        ?string $namespace = null
+    ): PodLogService {
         return new PodLogService(
             $this->api()->v1CorePod(),
             $podName,
@@ -323,8 +374,11 @@ class K8s
      * @param string|null $namespace The specific namespace the pod is in. Defaults to the one specified in options.
      * @return PodAttachService
      */
-    public function attach(string $podName, ?string $container = null, ?string $namespace = null): PodAttachService
-    {
+    public function attach(
+        string $podName,
+        ?string $container = null,
+        ?string $namespace = null
+    ): PodAttachService {
         $attach = new PodAttachService(
             $this->api()->v1CorePodAttachOptions(),
             $podName,
@@ -345,8 +399,11 @@ class K8s
      * @param string|string[] $command The command to run.
      * @param string|null $namespace An optional namespace (Otherwise the default is used).
      */
-    public function exec(string $podName, $command = [], ?string $namespace = null): PodExecService
-    {
+    public function exec(
+        string $podName,
+        $command = [],
+        ?string $namespace = null
+    ): PodExecService {
         $exec = new PodExecService(
             $this->api()->v1CorePodExecOptions(),
             $podName,
@@ -369,8 +426,11 @@ class K8s
      * @return FileUploader
      * @throws File\Exception\FileUploadException
      */
-    public function uploader(string $podName, ?string $source = null, ?string $destination = null) : FileUploader
-    {
+    public function uploader(
+        string $podName,
+        ?string $source = null,
+        ?string $destination = null
+    ): FileUploader {
         $fileUpload = new FileUploader(
             $this->factory->makeArchiveFactory(),
             $this->exec($podName)
@@ -390,8 +450,10 @@ class K8s
      * @param string|string[] $path The path(s) to download from. Either a string path, or an array of paths.
      * @return FileDownloader
      */
-    public function downloader(string $podName, $path = []): FileDownloader
-    {
+    public function downloader(
+        string $podName,
+        $path = []
+    ): FileDownloader {
         $fileDownloader = new FileDownloader(
             $this->exec($podName),
             $this->factory->makeArchiveFactory()
@@ -411,8 +473,10 @@ class K8s
      * @param int|array $port The port, or array of ports, to forward.
      * @return PortForwardService
      */
-    public function portforward(string $podName, $port): PortForwardService
-    {
+    public function portforward(
+        string $podName,
+        $port
+    ): PortForwardService {
         return new PortForwardService(
             $podName,
             array_map('intval', (array)$port),

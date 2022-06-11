@@ -60,13 +60,17 @@ class KindManager
     /**
      * Create a Kubernetes resource.
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace to create it in (uses default from options if not defined).
-     * @return object
+     * @return T
      */
-    public function create(object $kind, $query = [], ?string $namespace = null): object
-    {
+    public function create(
+        object $kind,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
 
@@ -80,12 +84,15 @@ class KindManager
     /**
      * Delete a Kubernetes resource.
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param array $query Any additional query parameters.
-     * @return object
+     * @return T
      */
-    public function delete(object $kind, $query = []): object
-    {
+    public function delete(
+        object $kind,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -99,14 +106,19 @@ class KindManager
     /**
      * Patch a Kubernetes resource using a patch object (json, strategic, merge).
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param PatchInterface $patch A patch class object.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
-     * @return object This would typically be the same object passed in as the Kind.
+     * @return T This would typically be the same object passed in as the Kind.
      */
-    public function patch(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
-    {
+    public function patch(
+        object $kind,
+        PatchInterface $patch,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
         $options['body'] = $patch;
@@ -122,14 +134,19 @@ class KindManager
     /**
      * Patch a Kubernetes status sub-resource using a patch object (json, strategic, merge).
      *
-     * @param object $kind Any Kind model object.
+     * @template T of object
+     * @param T $kind Any Kind model object.
      * @param PatchInterface $patch A patch class object.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace the Kind resides in (uses default from options if not defined).
-     * @return object This would typically be the same object passed in as the Kind.
+     * @return T This would typically be the same object passed in as the Kind.
      */
-    public function patchStatus(object $kind, PatchInterface $patch, array $query = [], ?string $namespace = null): object
-    {
+    public function patchStatus(
+        object $kind,
+        PatchInterface $patch,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
         $options['body'] = $patch;
@@ -145,12 +162,15 @@ class KindManager
     /**
      * Replace a Kubernetes resource (an atomic patch operation that requires a resourceVersion).
      *
-     * @param object $kind The Kind object model.
+     * @template T of object
+     * @param T $kind The Kind object model.
      * @param array $query Any additional query parameters.
-     * @return object The Kind model object being replaced.
+     * @return T The Kind model object being replaced.
      */
-    public function replace(object $kind, array $query = []): object
-    {
+    public function replace(
+        object $kind,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -164,12 +184,15 @@ class KindManager
     /**
      * Replace a Kubernetes status sub-resource (an atomic patch operation that requires a resourceVersion).
      *
-     * @param object $kind The Kind object model.
+     * @template T of object
+     * @param T $kind The Kind object model.
      * @param array $query Any additional query parameters.
-     * @return object The Kind model object being replaced.
+     * @return T The Kind model object being replaced.
      */
-    public function replaceStatus(object $kind, array $query = []): object
-    {
+    public function replaceStatus(
+        object $kind,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -188,8 +211,11 @@ class KindManager
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      * @return object Typically the Status object on success.
      */
-    public function deleteAllNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): object
-    {
+    public function deleteAllNamespaced(
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): object {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
 
@@ -207,8 +233,10 @@ class KindManager
      * @param array $query Any additional query parameters.
      * @return object Typically the Status object on success.
      */
-    public function deleteAll(string $kindFqcn, $query = []): object
-    {
+    public function deleteAll(
+        string $kindFqcn,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -221,13 +249,17 @@ class KindManager
     /**
      * Read a Kubernetes resource of a specific Kind.
      *
+     * @template T of object
      * @param string $name the name of the resource.
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to read.
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to read.
      * @param array $query Any additional query parameters.
-     * @return object
+     * @return T
      */
-    public function read(string $name, string $kindFqcn, $query = []): object
-    {
+    public function read(
+        string $name,
+        string $kindFqcn,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -246,8 +278,11 @@ class KindManager
      * @param array $query Any additional query parameters.
      * @return object
      */
-    public function readStatus(string $name, string $kindFqcn, $query = []): object
-    {
+    public function readStatus(
+        string $name,
+        string $kindFqcn,
+        array $query = []
+    ): object {
         $options['query'] = $query;
 
         return $this->execute(
@@ -261,12 +296,15 @@ class KindManager
     /**
      * List all Kubernetes resource of a specific kind.
      *
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
+     * @template T of object
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
-     * @return iterable<int, object>
+     * @return iterable<T>
      */
-    public function listAll(string $kindFqcn, $query = []): iterable
-    {
+    public function listAll(
+        string $kindFqcn,
+        array $query = []
+    ): iterable {
         $options['query'] = $query;
 
         return $this->execute(
@@ -279,13 +317,17 @@ class KindManager
     /**
      * List all Kubernetes resource of a specific kind in a namespace.
      *
-     * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
+     * @template T of object
+     * @param class-string<T> $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
-     * @return iterable<int, object>
+     * @return iterable<T>
      */
-    public function listNamespaced(string $kindFqcn, $query = [], ?string $namespace = null): iterable
-    {
+    public function listNamespaced(
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): iterable {
         $options['query'] = $query;
         $options['namespace'] = $namespace;
 
@@ -303,8 +345,11 @@ class KindManager
      * @param class-string $kindFqcn The fully-qualified class name of the resource to list.
      * @param array $query Any additional query parameters.
      */
-    public function watchAll(callable $handler, string $kindFqcn, $query = []): void
-    {
+    public function watchAll(
+        callable $handler,
+        string $kindFqcn,
+        array $query = []
+    ): void {
         $query['watch'] = true;
         $options['query'] = $query;
         $options['handler'] = $handler;
@@ -324,8 +369,12 @@ class KindManager
      * @param array $query Any additional query parameters.
      * @param string|null $namespace The namespace. If not supplied, it will use the default namespace from the options.
      */
-    public function watchNamespaced(callable $handler, string $kindFqcn, $query = [], ?string $namespace = null): void
-    {
+    public function watchNamespaced(
+        callable $handler,
+        string $kindFqcn,
+        array $query = [],
+        ?string $namespace = null
+    ): void {
         $query['watch'] = true;
         $options['query'] = $query;
         $options['handler'] = $handler;
@@ -344,8 +393,10 @@ class KindManager
      * @param object $kind The Kind object model.
      * @param RequestInterface $request The request to proxy to the Kind.
      */
-    public function proxy(object $kind, RequestInterface $request): ResponseInterface
-    {
+    public function proxy(
+        object $kind,
+        RequestInterface $request
+    ): ResponseInterface {
         $options['method'] = $request->getMethod();
         $options['proxy'] = $request;
 
@@ -454,8 +505,11 @@ class KindManager
      * @param class-string|object $object
      * @return bool
      */
-    private function operationNeedsName(string $path, array $params, $object): bool
-    {
+    private function operationNeedsName(
+        string $path,
+        array $params,
+        $object
+    ): bool {
         return is_object($object)
             && strpos($path, '{name}') !== false
             && !in_array('{name}', $params, true);

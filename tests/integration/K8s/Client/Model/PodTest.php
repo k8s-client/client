@@ -31,7 +31,6 @@ class PodTest extends TestCase
             [new Container('test-pod', 'nginx:latest')]
         );
 
-        /** @var Pod $newPod */
         $newPod = $this->k8s()->create($pod);
 
         $this->assertInstanceOf(Pod::class, $newPod);
