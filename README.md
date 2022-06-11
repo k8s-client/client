@@ -64,15 +64,15 @@ Kubernetes may not be the same as the `k8s/api` patch version.
 ### Installing a Websocket Adapter
 
 Certain Kuberenetes API endpoints (such as exec, to run commands in a container) require websockets to communicate. If you
-need support for this, install one of these adapters...
+need support for this, install one of these adapters:
 
-ReactPHP based websocket adapter (https://github.com/k8s-client/ws-ratchet):
+* ReactPHP based websocket adapter (https://github.com/k8s-client/ws-ratchet):
 
-`composer require k8s/ws-ratchet`
+    *`composer require k8s/ws-ratchet`
 
-Swoole based websocket adapter (https://github.com/k8s-client/ws-swoole):
+* Swoole based websocket adapter (https://github.com/k8s-client/ws-swoole):
 
-`composer require k8s/ws-swoole`
+    * `composer require k8s/ws-swoole`
 
 See each library's readme for more configuration information.
 
@@ -86,7 +86,9 @@ use K8s\Client\K8sFactory;
 $k8s = (new K8sFactory())->loadFromKubeConfig();
 ```
 
-**Note**: This requires the use of an HttpClient factory helper. Install one of `k8s/http-symfony` or `k8s/http-guzzle`.
+**Note**: This requires the use of an HttpClient factory helper. Install one of these packages:
+* `k8s/http-symfony` (Symfony based HttpClient)
+* `k8s/http-guzzle` (Guzzle based HttpClient)
 
 ### Constructing the Client Manually
 
