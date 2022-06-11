@@ -68,7 +68,7 @@ need support for this, install one of these adapters:
 
 * ReactPHP based websocket adapter (https://github.com/k8s-client/ws-ratchet):
 
-    *`composer require k8s/ws-ratchet`
+    * `composer require k8s/ws-ratchet`
 
 * Swoole based websocket adapter (https://github.com/k8s-client/ws-swoole):
 
