@@ -18,7 +18,8 @@ use integration\K8s\Client\TestCase;
 use K8s\Api\Model\Api\Core\v1\Container;
 use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Api\Model\Api\Core\v1\PodList;
-use K8s\Api\Model\Api\Policy\v1beta1\Eviction;
+use K8s\Api\Model\Api\Policy\v1beta1\Eviction as v1beta1Eviction;
+use K8s\Api\Model\Api\Policy\v1\Eviction as v1Eviction;
 use K8s\Api\Model\ApiMachinery\Apis\Meta\v1\WatchEvent;
 use K8s\Client\Patch\JsonPatch;
 
@@ -181,8 +182,24 @@ class PodTest extends TestCase
             [new Container('eviction-test', 'nginx:latest')]
         ));
 
-        $result = $this->k8s()->create(new Eviction('eviction-test'));
-        $this->assertInstanceOf(Eviction::class, $result);
+        $evictionClass = null;
+        $evictionObject = null;
+        if (class_exists(v1Eviction::class)) {
+            $evictionObject = new v1Eviction('eviction-test');
+            $evictionClass = v1Eviction::class;
+        } elseif (class_exists(v1beta1Eviction::class)) {
+            $evictionObject = new v1beta1Eviction('eviction-test');
+            $evictionClass = v1beta1Eviction::class;
+        } else {
+            $this->markTestSkipped('No usable eviction class.');
+        }
+
+        $result = $this->k8s()->create($evictionObject);
+
+        $this->assertInstanceOf(
+            $evictionClass,
+            $result
+        );
     }
 
     public function testItCanDeletePods(): void
