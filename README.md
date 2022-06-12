@@ -83,7 +83,14 @@ The easiest way to construct the client is from a pre-defined KubeConfig:
 ```php
 use K8s\Client\K8sFactory;
 
+# Attempt to load the default kubeconfig file:
 $k8s = (new K8sFactory())->loadFromKubeConfig();
+
+# Attempt to load a specific kubeconfig file from a full file path:
+$k8s = (new K8sFactory())->loadFromKubeConfigFile('/my/special/.kube/config');
+
+# Load a kubeconfig from string kubeconfig data:
+$k8s = (new K8sFactory())->loadFromKubeConfigData($kubeConfigData);
 ```
 
 **Note**: This requires the use of an HttpClient factory helper. Install one of these packages:
