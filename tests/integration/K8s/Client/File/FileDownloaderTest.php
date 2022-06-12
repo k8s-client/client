@@ -42,6 +42,7 @@ class FileDownloaderTest extends TestCase
             'test-copy',
             [new Container('test-copy', 'nginx:latest')]
         ));
+        sleep(2);
     }
 
     public function tearDown(): void
