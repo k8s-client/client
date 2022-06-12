@@ -50,7 +50,7 @@ class TestCase extends BaseTestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->httpClient = $http = new Psr18Client(
+        $this->httpClient = new Psr18Client(
             HttpClient::create([
                 "verify_peer" => false,
                 "verify_host" => false,
