@@ -51,7 +51,7 @@ class K8sFactoryTest extends TestCase
 
     public function testItCanLoadFromTheKubeConfigData(): void
     {
-        $config =file_get_contents(__DIR__ . '/../../../resources/.kube/config');
+        $config = file_get_contents(__DIR__ . '/../../../resources/.kube/config');
 
         $result = $this->subject->loadFromKubeConfigData($config);
         $options = $result->getOptions();
@@ -63,6 +63,16 @@ class K8sFactoryTest extends TestCase
         $this->assertEquals('/home/user/.minikube/ca.crt', $kubeConfig->getServerCertificateAuthority());
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.crt', $kubeConfig->getUserClientCertificate());
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.key', $kubeConfig->getUserClientKey());
+    }
+
+    public function testItCanLoadFromTheKubeConfigFilePath(): void
+    {
+        $configPath = __DIR__ . '/../../../resources/.kube/config';
+
+        $this->assertInstanceOf(
+            K8s::class,
+            $this->subject->loadFromKubeConfigFile($configPath)
+        );
     }
 
     public function testItCanSetTheHttpClientFactory(): void

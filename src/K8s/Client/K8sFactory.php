@@ -85,22 +85,40 @@ class K8sFactory
     }
 
     /**
-     * Load the k8s client from the default KubeConfig file (ie. $HOME/.kube/config).
+     * Load the k8s client from the default KubeConfig file. It will load it as follows:
+     *
+     *   1. If the second parameter for a file path is specified, it will use that.
+     *   2. Attempt to load from the current working directory: $CWD/.kube/config).
+     *   3. Attempt to load from the default home location: $HOME/.kube/config).
      *
      * @param string|null $contextName A specific context name to use from the config.
+     * @param string|null $configFilePath A specific kubeconfig file path. If not provided, it will attempt to find one.
      * @return K8s
      */
     public function loadFromKubeConfig(
+        ?string $contextName = null,
+        ?string $configFilePath = null
+    ): K8s {
+        return $this->loadFromKubeConfigData(
+            $this->getKubeConfigContents($configFilePath),
+            $contextName
+        );
+    }
+
+    /**
+     * Convenience method for loading the config from a specific file path.
+     *
+     * @param string $configFilePath The full file path to load the kubeconfig from.
+     * @param string|null $contextName A specific context name to use from the config.
+     * @return K8s
+     */
+    public function loadFromKubeConfigFile(
+        string $configFilePath,
         ?string $contextName = null
     ): K8s {
-        $config = $this->getKubeConfigContents();
-        if ($config === '') {
-            throw new RuntimeException('The kubeconfig file is empty.');
-        }
-
-        return $this->loadFromKubeConfigData(
-            $config,
-            $contextName
+        return $this->loadFromKubeConfig(
+            $contextName,
+            $configFilePath
         );
     }
 
@@ -164,15 +182,24 @@ class K8sFactory
         return new K8s($options);
     }
 
-    private function getKubeConfigContents(): string
+    private function getKubeConfigContents(?string $configFilePath = null): string
     {
         $defaultConfig = getcwd() . self::KUBE_CONFIG_PATH;
         $homeConfig = ($_SERVER['HOME'] ?? '') . self::KUBE_CONFIG_PATH;
 
-        if (file_exists($defaultConfig)) {
-            return (string)file_get_contents($defaultConfig);
+        if ($configFilePath !== null && !file_exists($configFilePath)) {
+            throw new RuntimeException(sprintf(
+                'The specified kubeconfig file was not found: %s',
+                $configFilePath
+            ));
+        }
+
+        if ($configFilePath !== null) {
+            $configContents = (string)file_get_contents($configFilePath);
+        } elseif (file_exists($defaultConfig)) {
+            $configContents = (string)file_get_contents($defaultConfig);
         } elseif (file_exists($homeConfig)) {
-            return (string)file_get_contents($homeConfig);
+            $configContents = (string)file_get_contents($homeConfig);
         } else {
             throw new RuntimeException(sprintf(
                 'A kubeconfig file was not found. Checked these paths: %s, %s',
@@ -180,5 +207,11 @@ class K8sFactory
                 $homeConfig
             ));
         }
+
+        if ($configContents === '') {
+            throw new RuntimeException('The kubeconfig file is empty.');
+        }
+
+        return $configContents;
     }
 }
