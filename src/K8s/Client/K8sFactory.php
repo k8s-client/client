@@ -38,24 +38,60 @@ class K8sFactory
      */
     private $kubeConfigParser;
 
+    /**
+     * @var HttpClientFactoryInterface|null
+     */
+    private $httpClientFactory;
+
+    /**
+     * @var WebsocketClientFactoryInterface|null
+     */
+    private $websocketClientFactory;
+
     public function __construct(
-        ?KubeConfigParser $kubeConfigParser = null
+        ?KubeConfigParser $kubeConfigParser = null,
+        ?HttpClientFactoryInterface $httpClientFactory = null,
+        ?WebsocketClientFactoryInterface $websocketClientFactory = null
     ) {
         $this->kubeConfigParser = $kubeConfigParser ?? new KubeConfigParser();
+        $this->websocketClientFactory = $websocketClientFactory;
+        $this->httpClientFactory = $httpClientFactory;
+    }
+
+    /**
+     * Set a HttpClientFactory to use when instantiating the K8s client.
+     *
+     * @param HttpClientFactoryInterface $httpClientFactory
+     * @return $this
+     */
+    public function usingHttpClientFactory(HttpClientFactoryInterface $httpClientFactory): self
+    {
+        $this->httpClientFactory = $httpClientFactory;
+
+        return $this;
+    }
+
+    /**
+     * Set a WebsocketClientFactory to use when instantiating the K8s client.
+     *
+     * @param WebsocketClientFactoryInterface $websocketClientFactory
+     * @return $this
+     */
+    public function usingWebsocketClientFactory(WebsocketClientFactoryInterface $websocketClientFactory): self
+    {
+        $this->websocketClientFactory = $websocketClientFactory;
+
+        return $this;
     }
 
     /**
      * Load the k8s client from the default KubeConfig file (ie. $HOME/.kube/config).
      *
      * @param string|null $contextName A specific context name to use from the config.
-     * @param HttpClientFactoryInterface|null $httpClientFactory A factory used to instantiate the HTTP client.
-     * @param WebsocketClientFactoryInterface|null $websocketClientFactory A factory used to instantiate the Websocket adapter.
      * @return K8s
      */
     public function loadFromKubeConfig(
-        ?string $contextName = null,
-        ?HttpClientFactoryInterface $httpClientFactory = null,
-        ?WebsocketClientFactoryInterface $websocketClientFactory = null
+        ?string $contextName = null
     ): K8s {
         $config = $config ?? $this->getKubeConfigContents();
         if ($config === '') {
@@ -64,9 +100,7 @@ class K8sFactory
 
         return $this->loadFromKubeConfigData(
             $config,
-            $contextName,
-            $httpClientFactory,
-            $websocketClientFactory
+            $contextName
         );
     }
 
@@ -75,23 +109,17 @@ class K8sFactory
      *
      * @param string $kubeConfig The raw YAML string from a KubeConfig file.
      * @param string|null $contextName A specific context name to use from the config.
-     * @param HttpClientFactoryInterface|null $httpClientFactory A factory used to instantiate the HTTP client.
-     * @param WebsocketClientFactoryInterface|null $websocketClientFactory A factory used to instantiate the Websocket adapter.
      * @return K8s
      */
     public function loadFromKubeConfigData(
         string $kubeConfig,
-        ?string $contextName = null,
-        ?HttpClientFactoryInterface $httpClientFactory = null,
-        ?WebsocketClientFactoryInterface $websocketClientFactory = null
+        ?string $contextName = null
     ): K8s {
         $kubeConfig = $this->kubeConfigParser->parse($kubeConfig);
         $context = $kubeConfig->getFullContext($contextName);
 
         return $this->loadFromKubeConfigContext(
-            $context,
-            $httpClientFactory,
-            $websocketClientFactory
+            $context
         );
     }
 
@@ -99,14 +127,10 @@ class K8sFactory
      * Load the k8s client from a pre-processed KubeConfig context.
      *
      * @param FullContext $context the full context from the parsed kubeconfig.
-     * @param HttpClientFactoryInterface|null $httpClientFactory A factory used to instantiate the HTTP client.
-     * @param WebsocketClientFactoryInterface|null $websocketClientFactory A factory used to instantiate the Websocket adapter.
      * @return K8s
      */
     private function loadFromKubeConfigContext(
-        FullContext $context,
-        ?HttpClientFactoryInterface $httpClientFactory = null,
-        ?WebsocketClientFactoryInterface $websocketClientFactory = null
+        FullContext $context
     ): K8s {
         $options = new Options(
             $context->getServer(),
@@ -114,6 +138,7 @@ class K8sFactory
         );
         $options->setKubeConfigContext($context);
 
+        $httpClientFactory = $this->httpClientFactory;
         if (!$httpClientFactory) {
             foreach (self::HTTPCLIENT_FACTORIES as $clientFactory) {
                 if (class_exists($clientFactory)) {
@@ -124,6 +149,7 @@ class K8sFactory
         if ($httpClientFactory) {
             $options->setHttpClientFactory($httpClientFactory);
         }
+        $websocketClientFactory = $this->websocketClientFactory;
         if (!$websocketClientFactory) {
             foreach (self::WEBSOCKET_FACTORIES as $clientFactory) {
                 if (class_exists($clientFactory)) {

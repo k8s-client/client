@@ -15,6 +15,9 @@ namespace integration\K8s\Client;
 
 use K8s\Client\K8s;
 use K8s\Client\K8sFactory;
+use K8s\Core\Contract\HttpClientFactoryInterface;
+use K8s\Core\Contract\WebsocketClientFactoryInterface;
+use Mockery;
 use unit\K8s\Client\TestCase;
 
 class K8sFactoryTest extends TestCase
@@ -60,5 +63,35 @@ class K8sFactoryTest extends TestCase
         $this->assertEquals('/home/user/.minikube/ca.crt', $kubeConfig->getServerCertificateAuthority());
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.crt', $kubeConfig->getUserClientCertificate());
         $this->assertEquals('/home/user/.minikube/profiles/minikube/client.key', $kubeConfig->getUserClientKey());
+    }
+
+    public function testItCanSetTheHttpClientFactory(): void
+    {
+        $_SERVER['HOME'] = __DIR__ . '/../../../resources';
+
+        $httpClientFactory = Mockery::mock(HttpClientFactoryInterface::class);
+        $this->subject->usingHttpClientFactory($httpClientFactory);
+        $result = $this->subject->loadFromKubeConfig();
+        $options = $result->getOptions();
+
+        $this->assertEquals(
+            $httpClientFactory,
+            $options->getHttpClientFactory()
+        );
+    }
+
+    public function testItCanSetTheWebsocketClientFactory(): void
+    {
+        $_SERVER['HOME'] = __DIR__ . '/../../../resources';
+
+        $websocketClientFactory = Mockery::mock(WebsocketClientFactoryInterface::class);
+        $this->subject->usingWebsocketClientFactory($websocketClientFactory);
+        $result = $this->subject->loadFromKubeConfig();
+        $options = $result->getOptions();
+
+        $this->assertEquals(
+            $websocketClientFactory,
+            $options->getWebsocketClientFactory()
+        );
     }
 }
