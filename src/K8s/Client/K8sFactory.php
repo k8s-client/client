@@ -93,7 +93,7 @@ class K8sFactory
     public function loadFromKubeConfig(
         ?string $contextName = null
     ): K8s {
-        $config = $config ?? $this->getKubeConfigContents();
+        $config = $this->getKubeConfigContents();
         if ($config === '') {
             throw new RuntimeException('The kubeconfig file is empty.');
         }
