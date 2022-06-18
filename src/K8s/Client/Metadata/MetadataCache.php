@@ -65,7 +65,6 @@ class MetadataCache
      */
     public function get(string $modelFqcn): ModelMetadata
     {
-        $metadata = null;
         if ($this->cache) {
             $metadata = $this->getOrCacheMetadata($modelFqcn);
         } else {
