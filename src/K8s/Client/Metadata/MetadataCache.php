@@ -53,8 +53,8 @@ class MetadataCache
     private $parser;
 
     public function __construct(
-        ?MetadataParser $parser = null,
-        ?CacheInterface $cache = null
+        ?CacheInterface $cache = null,
+        ?MetadataParser $parser = null
     ) {
         $this->parser = $parser ?? new MetadataParser();
         $this->cache = $cache;

@@ -174,8 +174,8 @@ class Factory
             return $this->metadataCache;
         }
         $this->metadataCache = new MetadataCache(
-            new MetadataParser(),
-            $this->options->getCache()
+            $this->options->getCache(),
+            new MetadataParser()
         );
 
         return $this->metadataCache;

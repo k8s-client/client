@@ -43,8 +43,8 @@ class MetadataCacheTest extends TestCase
         $this->parser = \Mockery::spy(MetadataParser::class);
         $this->cache = \Mockery::spy(CacheInterface::class);
         $this->subject = new MetadataCache(
-            $this->parser,
-            $this->cache
+            $this->cache,
+            $this->parser
         );
     }
 
