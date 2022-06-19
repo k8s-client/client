@@ -61,6 +61,48 @@ class MetadataCache
     }
 
     /**
+     * Cache all kind map data and Kind model metadata.
+     *
+     * @return void
+     */
+    public function cacheAll(): void
+    {
+        if (!$this->cache) {
+            return;
+        }
+        $this->initKindMap();
+
+        foreach ($this->kindMap as $kinds) {
+            foreach ($kinds as $modelFqcn) {
+                $this->getOrCacheMetadata($modelFqcn);
+            }
+        }
+    }
+
+    /**
+     * Delete all cache for kind map data and Kind model metadata.
+     *
+     * @return void
+     */
+    public function deleteAll(): void
+    {
+        if (!$this->cache) {
+            return;
+        }
+        $this->initKindMap(false);
+        $this->cache->delete(self::PREFIX_KIND_MAP);
+
+        $modelClasses = [];
+        foreach ($this->kindMap as $kinds) {
+            foreach ($kinds as $modelFqcn) {
+               $modelClasses[] = self::PREFIX_KIND_META . $modelFqcn;
+            }
+        }
+
+        $this->cache->deleteMultiple($modelClasses);
+    }
+
+    /**
      * @param class-string $modelFqcn
      */
     public function get(string $modelFqcn): ModelMetadata
@@ -79,22 +121,31 @@ class MetadataCache
      */
     public function getModelFqcnFromKind(string $apiVersion, string $kind): ?string
     {
-        if ($this->kindMap === null) {
-            $this->kindMap = $this->cache ? $this->getOrCacheKindMap() : $this->generateKindMap();
-        }
+        $this->initKindMap();
 
         return $this->kindMap[$apiVersion][$kind] ?? null;
     }
 
-    private function getOrCacheKindMap(): array
+    private function initKindMap(bool $cache = true): void
     {
-        $kindMap = $this->cache->get(self::PREFIX_KIND_MAP);
-        if (!$kindMap) {
-            $kindMap = $this->generateKindMap();
-            $this->cache->set(self::PREFIX_KIND_MAP, $kindMap);
+        if ($this->kindMap !== null) {
+            return;
         }
 
-        return $kindMap;
+        $kindMap = $this->cache
+            ? $this->cache->get(self::PREFIX_KIND_MAP)
+            : null;
+
+        if (!$kindMap) {
+            $this->generateKindMap();
+        }
+
+        if ($this->cache && $cache) {
+            $this->cache->set(
+                self::PREFIX_KIND_MAP,
+                $this->kindMap
+            );
+        }
     }
 
     /**
@@ -127,9 +178,12 @@ class MetadataCache
         return $this->modelMetadata[$modelFqcn];
     }
 
-    private function generateKindMap(): array
+    private function generateKindMap(): void
     {
-        $kindMap = [];
+        if ($this->kindMap !== null) {
+            return;
+        }
+        $this->kindMap = [];
         $path = null;
 
         foreach (self::MODEL_PATHS as $modelPath) {
@@ -190,9 +244,7 @@ class MetadataCache
                 $this->kindMap[$apiVersion] = [];
             }
 
-            $kindMap[$apiVersion][$classKind->kind] = $fqcn;
+            $this->kindMap[$apiVersion][$classKind->kind] = $fqcn;
         }
-
-        return $kindMap;
     }
 }

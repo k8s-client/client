@@ -17,6 +17,7 @@ use K8s\Api\Model\Api\Core\v1\Pod;
 use K8s\Client\Metadata\MetadataCache;
 use K8s\Client\Metadata\MetadataParser;
 use K8s\Client\Metadata\ModelMetadata;
+use Mockery;
 use Psr\SimpleCache\CacheInterface;
 use unit\K8s\Client\TestCase;
 
@@ -40,8 +41,8 @@ class MetadataCacheTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->parser = \Mockery::spy(MetadataParser::class);
-        $this->cache = \Mockery::spy(CacheInterface::class);
+        $this->parser = Mockery::spy(MetadataParser::class);
+        $this->cache = Mockery::spy(CacheInterface::class);
         $this->subject = new MetadataCache(
             $this->cache,
             $this->parser
@@ -61,7 +62,7 @@ class MetadataCacheTest extends TestCase
     public function testGetFromCacheWhenItIsCached(): void
     {
         $this->cache->shouldReceive('get')
-            ->andReturn(\Mockery::spy(ModelMetadata::class));
+            ->andReturn(Mockery::spy(ModelMetadata::class));
 
         $this->subject->get(Pod::class);
         $this->parser->shouldNotHaveReceived('parse');
@@ -73,5 +74,72 @@ class MetadataCacheTest extends TestCase
         $result = $this->subject->getModelFqcnFromKind('v1', 'Pod');
 
         $this->assertEquals(Pod::class, $result);
+    }
+
+    public function testCacheAllCachesTheKindMapAndMetadata(): void
+    {
+        $this->subject->cacheAll();
+
+        $this->cache->shouldHaveReceived(
+            'set',
+            [
+                Mockery::pattern('/^kind-meta/'),
+                Mockery::andAnyOtherArgs(),
+            ]
+        );
+        $this->cache->shouldHaveReceived(
+            'set',
+            [
+                'kind-map',
+                Mockery::andAnyOtherArgs(),
+            ]
+        );
+    }
+
+    public function testDeleteAllRemovesTheKindMapAndMetadataCache(): void
+    {
+        $this->subject->deleteAll();
+
+        $this->cache->shouldHaveReceived(
+            'delete',
+            ['kind-map']
+        );
+        $this->cache->shouldHaveReceived(
+            'deleteMultiple',
+            [
+                Mockery::on(function (iterable $keys) {
+                    foreach ($keys as $key) {
+                        if (preg_match('/^kind-meta/', $key) !== 1) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }),
+                Mockery::andAnyOtherArgs(),
+            ]
+        );
+    }
+
+    public function testIfThereIsNoCacheThenCacheAllDoesNotCache(): void
+    {
+        $this->subject = new MetadataCache(
+            null,
+            $this->parser
+        );
+
+        $this->subject->cacheAll();
+        $this->expectNotToPerformAssertions();
+    }
+
+    public function testIfThereIsNoCacheThenDeleteAllDoesNothing(): void
+    {
+        $this->subject = new MetadataCache(
+            null,
+            $this->parser
+        );
+
+        $this->subject->deleteAll();
+        $this->expectNotToPerformAssertions();
     }
 }
