@@ -84,12 +84,11 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Minikube
-        uses: manusa/actions-setup-minikube@v2.3.0
+        uses: medyagh/setup-minikube@latest
         with:
-          minikube version: 'v1.25.2'
-          kubernetes version: ${{ matrix.kubernetes-versions }}
+          minikube-version: 'v1.25.2'
+          kubernetes-version: ${{ matrix.kubernetes-versions }}
           driver: docker
-          github token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Configure Kubernetes Access Token
         id: minikube
