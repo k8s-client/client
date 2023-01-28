@@ -84,7 +84,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Minikube
-        uses: medyagh/setup-minikube@latest
+        uses: medyagh/setup-minikube@master
         with:
           minikube-version: 'v1.25.2'
           kubernetes-version: ${{ matrix.kubernetes-versions }}
